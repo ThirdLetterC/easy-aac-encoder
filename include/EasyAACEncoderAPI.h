@@ -11,7 +11,7 @@
 #define Easy_API
 #define Easy_APICALL
 
-typedef void* Easy_Handle;
+typedef void *Easy_Handle;
 typedef Easy_Handle EasyAACEncoder_Handle;
 
 enum EasyAACEncoderError
@@ -44,7 +44,7 @@ enum Rate
 
 typedef struct _g711param
 {
-    ;
+    unsigned char reserved;
 } G711Param;
 
 typedef struct _g726param

@@ -7,23 +7,30 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include "decode_to_pcm.h"
+
+#include <cstdint>
+#include <memory>
 
 extern "C"
 {
 #include <faac.h>
 }
 
+struct FaacEncoderDeleter
+{
+    void operator()(faacEncHandle encoder) const noexcept;
+};
+
 class PcmToAac
 {
   public:
     PcmToAac() = default;
-    ~PcmToAac();
+    ~PcmToAac() = default;
     PcmToAac(const PcmToAac&) = delete;
     PcmToAac& operator=(const PcmToAac&) = delete;
+    PcmToAac(PcmToAac&&) = default;
+    PcmToAac& operator=(PcmToAac&&) = default;
 
   public:
     bool Init(const InAudioInfo *info);
@@ -31,25 +38,25 @@ class PcmToAac
                unsigned int bufferSize);
 
   public:
-    unsigned int GetPCMBitSize()
+    unsigned int GetPCMBitSize() const
     {
         return m_nPCMBitSize;
     }
-    unsigned int GetInputSamples()
+    unsigned int GetInputSamples() const
     {
         return m_nInputSamples;
     }
-    unsigned int GetMaxOutputBytes()
+    unsigned int GetMaxOutputBytes() const
     {
         return m_nMaxOutputBytes;
     }
-    unsigned int GetPCMBufferSize()
+    unsigned int GetPCMBufferSize() const
     {
         return (m_nInputSamples * (m_nPCMBitSize / 8));
     }
 
   private:
-    faacEncHandle hEncoder = nullptr;
+    std::unique_ptr<void, FaacEncoderDeleter> hEncoder;
     faacEncConfigurationPtr pConfiguration = nullptr;
 
     unsigned int m_nPCMBitSize = 16;

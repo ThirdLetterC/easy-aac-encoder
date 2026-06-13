@@ -11,8 +11,7 @@
  * Created on April 11, 2015, 11:44 AM
  */
 
-#ifndef EasyAACEncoder_H
-#define EasyAACEncoder_H
+#pragma once
 
 #include "audio_buffer.h"
 #include "decode_to_pcm.h"
@@ -49,26 +48,24 @@ class G7ToAac
     bool CreateBuffer();
 
   private:
-    unsigned int nCount = 0;
+    unsigned int pcm_buffer_used_ = 0;
 
-    unsigned int m_nPCMBufferSize = 0;
-    std::vector<unsigned char> m_pbPCMBuffer;
+    unsigned int pcm_buffer_size_ = 0;
+    std::vector<unsigned char> pcm_buffer_;
 
-    unsigned int m_nMaxOutputBytes = 0;
-    std::vector<unsigned char> m_pbAACBuffer;
+    unsigned int max_output_bytes_ = 0;
+    std::vector<unsigned char> aac_buffer_;
 
-    unsigned int m_nPCMSize = 0;
-    std::vector<unsigned char> m_pbPCMTmpBuffer;
+    unsigned int decoded_pcm_size_ = 0;
+    std::vector<unsigned char> decoded_pcm_buffer_;
 
-    std::vector<unsigned char> m_pbG7FrameBuffer;
-    unsigned int m_nG7FrameBufferSize = 0;
+    std::vector<unsigned char> compressed_frame_buffer_;
+    unsigned int compressed_frame_size_ = 0;
 
     audio_buffer m_audio_buffer_;
-    //------
+
     InAudioInfo m_inAudioInfo;
 
     std::unique_ptr<IDecodeToPcm> m_pDecodeToPcm;
     std::unique_ptr<PcmToAac> m_pPCMToAAC;
 };
-
-#endif /* EasyAACEncoder_H */

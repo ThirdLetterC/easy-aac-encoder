@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <vector>
 
 class audio_buffer
@@ -18,5 +19,5 @@ class audio_buffer
 
   private:
     std::vector<unsigned char> data_;
-    int len_ = 0;
+    std::size_t len_ = 0;
 };

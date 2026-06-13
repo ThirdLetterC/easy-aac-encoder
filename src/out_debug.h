@@ -5,22 +5,18 @@
     Website: http://www.easydarwin.org
 */
 
-#ifndef _OUTDEBUG_H
-#define _OUTDEBUG_H
+#pragma once
 
-#define DBG_MSG_BUFF_SIZE 3000
-#define FILE_NAME "-EasyAACEncoder-"
+#include <cstdio>
 
-#include <stdio.h>
+inline constexpr int DBG_MSG_BUFF_SIZE = 3000;
+inline constexpr const char* FILE_NAME = "-EasyAACEncoder-";
+inline constexpr bool AAC_DEBUG = false;
 
 #define INFO_D(OUT, fmt, ...)                                                                                          \
     {                                                                                                                  \
         if (OUT)                                                                                                       \
         {                                                                                                              \
-            printf(fmt, ##__VA_ARGS__);                                                                                \
+            std::printf(fmt, ##__VA_ARGS__);                                                                           \
         }                                                                                                              \
     }
-
-#define AAC_DEBUG 0
-
-#endif

@@ -5,48 +5,40 @@
     Website: http://www.easydarwin.org
 */
 
-#ifndef _TOOLS_H_
-#define _TOOLS_H_
+#pragma once
 
 #include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#include <errno.h>
+#include <cstddef>
 
-#define PFRAME 0x00
-#define IFRAME 0x01
+inline constexpr int PFRAME = 0x00;
+inline constexpr int IFRAME = 0x01;
 
-const int iBufLen = 1024 * 128;
-const int iRecvBufLen = iBufLen * 2;
-const int iMaxParamterNum = 128;
-const int iBufNum = 10;
-const int MAX_BUF_NUM = 50;
-const int iCharBufLen = 64;
-const char BoundTag[] = "\r\n";               // Frame separator marker
-const int BoundTagLen = sizeof(BoundTag) - 1; // Frame separator marker length
+inline constexpr int iBufLen = 1024 * 128;
+inline constexpr int iRecvBufLen = iBufLen * 2;
+inline constexpr int iMaxParamterNum = 128;
+inline constexpr int iBufNum = 10;
+inline constexpr int MAX_BUF_NUM = 50;
+inline constexpr int iCharBufLen = 64;
+inline constexpr char BoundTag[] = "\r\n";               // Frame separator marker
+inline constexpr int BoundTagLen = sizeof(BoundTag) - 1; // Frame separator marker length
 // const char IFrameTag[]  = "HISI264I";// Recording I-frame marker
 // const char PFrameTag[]  = "HISI264P";// Recording P-frame marker
 // const int FrameTagLen = sizeof(IFrameTag) - 1;// Recording frame marker length
 
-const int MaxWaitTime = 3000; // Timeout
-const int MaxCameraNum = 24;  // Maximum number of cameras
+inline constexpr int MaxWaitTime = 3000; // Timeout
+inline constexpr int MaxCameraNum = 24;  // Maximum number of cameras
 
-const int AUDIO_BUFFER_SIZE = 960; // Size of each playback buffer block
-const int MAX_AUDIO_BUF = 4;       // Notification index for the playback buffer
-const int BUFFERNOTIFYSIZE = AUDIO_BUFFER_SIZE;
+inline constexpr int AUDIO_BUFFER_SIZE = 960; // Size of each playback buffer block
+inline constexpr int MAX_AUDIO_BUF = 4;       // Notification index for the playback buffer
+inline constexpr int BUFFERNOTIFYSIZE = AUDIO_BUFFER_SIZE;
 /*8192*/ /*192000*/ // Buffer notification position size. See the DirectSound application development quick start.
-const int SAMPLE_RATE = 8000; /*44100*/ // PCM sample rate: 8k
-const int N_CHANNEL = 1; /*2*/          // Number of PCM channels: mono
-const int BITS_PER_SAMPLE = 16;         // Bits per sample
-const int CHANNEL = 1;
-const int SAMPLES_PER_SECOND = 8000;
-const int SIZE_AUDIO_FRAME = 960;
-
-#ifndef TRACE
-#define TRACE printf
-#endif
+inline constexpr int SAMPLE_RATE = 8000; /*44100*/ // PCM sample rate: 8k
+inline constexpr int N_CHANNEL = 1; /*2*/          // Number of PCM channels: mono
+inline constexpr int BITS_PER_SAMPLE = 16;         // Bits per sample
+inline constexpr int CHANNEL = 1;
+inline constexpr int SAMPLES_PER_SECOND = 8000;
+inline constexpr int SIZE_AUDIO_FRAME = 960;
 
 /*!
  \brief H264 stream callback function pointer
@@ -70,6 +62,7 @@ typedef void (*fMessageCallBack)(void *pAlarmInfo, void *pUserData);
 typedef struct
 {
     char *start;
+    std::size_t capacity;
     size_t length;
     int frame_type;
     int frame_index;
@@ -90,7 +83,10 @@ typedef struct _buffers_t
     _buffers_t()
         : rear(0), front(0), bufnum(0), fps(0), pOnVideoData(nullptr), pUserData(nullptr)
     {
-        memset(buf, 0, sizeof(buf));
+        for (auto &item : buf)
+        {
+            item = {};
+        }
     }
 
 } buffers_t;
@@ -104,5 +100,3 @@ int buffers_get_data(void *data, unsigned int *length, buffers_t *bufs, int *typ
 int buffers_put_data(const void *data, unsigned int length, buffers_t *bufs, int type, int channel, int frame_index);
 
 void buffers_clear_data(buffers_t *bufs);
-
-#endif

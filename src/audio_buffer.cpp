@@ -1,11 +1,16 @@
 #include "audio_buffer.h"
-#include "dss_buffers.h"
-#include "out_debug.h"
+
 #include <algorithm>
-#include <cstring>
+#include <cstddef>
+#include <limits>
+
+namespace
+{
+constexpr std::size_t DefaultBufferCapacity = 1024U * 128U;
+}
 
 audio_buffer::audio_buffer()
-    : data_(iBufLen)
+    : data_(DefaultBufferCapacity)
 {
 }
 
@@ -15,16 +20,16 @@ int audio_buffer::write_data(const void* data, int len)
     {
         return -1;
     }
-    if (static_cast<int>(data_.size()) - len_ < len)
+    const auto write_len = static_cast<std::size_t>(len);
+    if (data_.size() - len_ < write_len)
     {
-        if (AAC_DEBUG)
-            printf("audio_buffer full\n");
         return -1;
     }
-    if (len > 0)
+    if (write_len > 0)
     {
-        std::memcpy(data_.data() + len_, data, len);
-        len_ += len;
+        const auto* first = static_cast<const unsigned char*>(data);
+        std::copy_n(first, write_len, data_.data() + len_);
+        len_ += write_len;
         return len;
     }
     return 0;
@@ -36,17 +41,16 @@ int audio_buffer::get_data(unsigned char* dest, int how_you_want)
     {
         return -1;
     }
-    if (len_ == 0 || len_ < how_you_want)
+    const auto requested = static_cast<std::size_t>(how_you_want);
+    if (len_ == 0 || len_ < requested)
     {
         return 0;
     }
-    else
-    {
-        std::copy_n(data_.data(), how_you_want, dest);
-        std::move(data_.begin() + how_you_want, data_.begin() + len_, data_.begin());
-        len_ -= how_you_want;
-        return how_you_want;
-    }
+
+    std::copy_n(data_.data(), requested, dest);
+    std::move(data_.begin() + requested, data_.begin() + static_cast<std::ptrdiff_t>(len_), data_.begin());
+    len_ -= requested;
+    return how_you_want;
 }
 
 unsigned char* audio_buffer::get_writable_ptr()
@@ -58,13 +62,15 @@ void audio_buffer::update_data_len(int len)
 {
     if (len < 0)
     {
-        len_ = std::max(0, len_ + len);
+        const auto shrink_by = static_cast<std::size_t>(-len);
+        len_ = shrink_by >= len_ ? 0 : len_ - shrink_by;
         return;
     }
-    if (static_cast<int>(data_.size()) - len_ < len)
+    const auto grow_by = static_cast<std::size_t>(len);
+    if (data_.size() - len_ < grow_by)
     {
-        len_ = static_cast<int>(data_.size());
+        len_ = data_.size();
         return;
     }
-    len_ += len;
+    len_ += grow_by;
 }

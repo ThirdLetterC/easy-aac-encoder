@@ -36,6 +36,12 @@ Easy_API int Easy_APICALL Easy_AACEncoder_Encode(Easy_Handle handle, const unsig
 Easy_API int Easy_APICALL Easy_AACEncoder_EncodeEx(Easy_Handle handle, const unsigned char* inbuf, unsigned int inlen,
                                                    unsigned char* outbuf, unsigned int outcap, unsigned int* outlen)
 {
+    if (outlen == nullptr)
+    {
+        return EasyAACEncoder_InvalidArgument;
+    }
+    *outlen = 0;
+
     if (handle == nullptr)
     {
         return EasyAACEncoder_InvalidArgument;

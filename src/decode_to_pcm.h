@@ -7,22 +7,12 @@
 
 #pragma once
 
-#ifndef _IDECODETOPCM_H
-#define _IDECODETOPCM_H
-
 #include "EasyAACEncoderAPI.h"
 
-#define USE_SHOUT_G711PACK 1
+#include <cstdint>
 
-#if USE_SHOUT_G711PACK
-#define G711_ONE_LEN 160
-#define G711_ONE_OFFSET 0
-
-#else
-#define G711_ONE_LEN 164
-#define G711_ONE_OFFSET 4
-#endif
-
+inline constexpr int G711_ONE_LEN = 160;
+inline constexpr int G711_ONE_OFFSET = 0;
 inline constexpr int CON_PCM_SIZE = 320;
 
 class audio_buffer;
@@ -92,5 +82,3 @@ class DecodeToPcmBase : public IDecodeToPcm
   private:
     int m_g7FrameSize = 0;
 };
-
-#endif
