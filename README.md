@@ -1,30 +1,30 @@
 ## EasyAACEncoder ##
 
-**EasyAACEncoder** 是EasyDarwin开源流媒体服务团队整理、开发的一款音频转码到AAC的工具库，目前支持G711a/G711u/G726/PCM等音频格式的转码，支持Linux（32&64）/ARM各平台；
+**EasyAACEncoder** is an audio transcoding library for converting audio to AAC, organized and developed by the EasyDarwin open-source streaming media service team. It currently supports transcoding from audio formats such as G711a, G711u, G726, and PCM, and supports Linux (32-bit and 64-bit) and ARM platforms.
 
-## 调用示例 ##
+## Usage Example ##
 
-- **testEasyAACEncoder**：通过EasyAACEncoderAPI对G711A/G711U/G726进行AAC转码；
+- **testEasyAACEncoder**: Transcodes G711A/G711U/G726 to AAC through the EasyAACEncoder API.
 
-	Linux编译方法，
+	Build on Linux:
 		
 		chmod +x ./Buildit
 		./Buildit
 
 
-## 调用过程 ##
+## Workflow ##
 ![](http://www.easydarwin.org/skin/easydarwin/images/easyaacencoder20180822.png)
 
 
-## 特殊说明 ##
-EasyAACEncoder目前支持的音视频格式：
+## Notes ##
+Audio formats currently supported by EasyAACEncoder:
 
 	/* Audio Codec */
 	enum Law
 	{
 		Law_ULaw	=	0, 		/**< U law */
 		Law_ALaw	=	1, 		/**< A law */
-		Law_PCM16	=	2, 		/**< 16 bit uniform PCM values. 原始 pcm 数据 */  
+		Law_PCM16	=	2, 		/**< 16 bit uniform PCM values. Raw PCM data */  
 		Law_G726	=	3		/**< G726 */
 	};
 	
@@ -38,11 +38,11 @@ EasyAACEncoder目前支持的音视频格式：
 	};
 
 
-## 获取更多信息 ##
+## More Information ##
 
-邮件：[support@easydarwin.org](mailto:support@easydarwin.org) 
+Email: [support@easydarwin.org](mailto:support@easydarwin.org) 
 
-WEB：[www.EasyDarwin.org](http://www.easydarwin.org)
+Website: [www.EasyDarwin.org](http://www.easydarwin.org)
 
 Copyright &copy; EasyDarwin.org 2012-2019
 
