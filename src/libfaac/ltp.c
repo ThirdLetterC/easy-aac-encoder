@@ -250,7 +250,8 @@ static double ltp_enc_tf(faacEncHandle hEncoder, CoderInfo *coderInfo, double *p
 
     /* Apply TNS analysis filter to the predicted spectrum. */
     if (tnsInfo != NULL)
-        TnsEncodeFilterOnly(tnsInfo, num_of_sfb, num_of_sfb, coderInfo->block_type, sfb_offset, mdct_predicted);
+        TnsEncodeFilterOnly(tnsInfo, num_of_sfb, num_of_sfb, (enum WINDOW_TYPE)coderInfo->block_type, sfb_offset,
+                            mdct_predicted);
 
     /* Get the prediction gain. */
     bit_gain = snr_pred(p_spectrum, mdct_predicted, sfb_prediction_used, sfb_offset, side_info, last_band,
@@ -268,10 +269,10 @@ void LtpInit(faacEncHandle hEncoder)
     {
         LtpInfo *ltpInfo = &(hEncoder->coderInfo[channel].ltpInfo);
 
-        ltpInfo->buffer = AllocMemory(NOK_LT_BLEN * sizeof(double));
-        ltpInfo->mdct_predicted = AllocMemory(2 * BLOCK_LEN_LONG * sizeof(double));
-        ltpInfo->time_buffer = AllocMemory(BLOCK_LEN_LONG * sizeof(double));
-        ltpInfo->ltp_overlap_buffer = AllocMemory(BLOCK_LEN_LONG * sizeof(double));
+        ltpInfo->buffer = (double *)AllocMemory(NOK_LT_BLEN * sizeof(double));
+        ltpInfo->mdct_predicted = (double *)AllocMemory(2 * BLOCK_LEN_LONG * sizeof(double));
+        ltpInfo->time_buffer = (double *)AllocMemory(BLOCK_LEN_LONG * sizeof(double));
+        ltpInfo->ltp_overlap_buffer = (double *)AllocMemory(BLOCK_LEN_LONG * sizeof(double));
 
         for (i = 0; i < NOK_LT_BLEN; i++)
             ltpInfo->buffer[i] = 0;

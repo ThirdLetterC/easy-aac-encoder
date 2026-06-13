@@ -22,6 +22,11 @@
 #ifndef _FFT_H_
 #define _FFT_H_
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif /* __cplusplus */
+
 typedef float fftfloat;
 
 #if defined DRM && !defined DRM_1024
@@ -51,5 +56,9 @@ void fft_terminate(FFT_Tables *fft_tables);
 void rfft(FFT_Tables *fft_tables, double *x, int logm);
 void fft(FFT_Tables *fft_tables, double *xr, double *xi, int logm);
 void ffti(FFT_Tables *fft_tables, double *xr, double *xi, int logm);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif

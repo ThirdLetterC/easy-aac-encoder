@@ -470,9 +470,9 @@ void ffti(FFT_Tables *fft_tables, double *xr, double *xi, int logm)
 void fft_initialize(FFT_Tables *fft_tables)
 {
     int i;
-    fft_tables->costbl = AllocMemory((MAXLOGM + 1) * sizeof(fft_tables->costbl[0]));
-    fft_tables->negsintbl = AllocMemory((MAXLOGM + 1) * sizeof(fft_tables->negsintbl[0]));
-    fft_tables->reordertbl = AllocMemory((MAXLOGM + 1) * sizeof(fft_tables->reordertbl[0]));
+    fft_tables->costbl = (fftfloat **)AllocMemory((MAXLOGM + 1) * sizeof(fft_tables->costbl[0]));
+    fft_tables->negsintbl = (fftfloat **)AllocMemory((MAXLOGM + 1) * sizeof(fft_tables->negsintbl[0]));
+    fft_tables->reordertbl = (unsigned short **)AllocMemory((MAXLOGM + 1) * sizeof(fft_tables->reordertbl[0]));
 
     for (i = 0; i < MAXLOGM + 1; i++)
     {
@@ -515,7 +515,7 @@ static void reorder(FFT_Tables *fft_tables, double *x, int logm)
 
     if (fft_tables->reordertbl[logm] == NULL) // create bit reversing table
     {
-        fft_tables->reordertbl[logm] = AllocMemory(size * sizeof(*(fft_tables->reordertbl[0])));
+        fft_tables->reordertbl[logm] = (unsigned short *)AllocMemory(size * sizeof(*(fft_tables->reordertbl[0])));
 
         for (i = 0; i < size; i++)
         {
@@ -597,8 +597,8 @@ static void check_tables(FFT_Tables *fft_tables, int logm)
         if (fft_tables->negsintbl[logm] != NULL)
             FreeMemory(fft_tables->negsintbl[logm]);
 
-        fft_tables->costbl[logm] = AllocMemory((size / 2) * sizeof(*(fft_tables->costbl[0])));
-        fft_tables->negsintbl[logm] = AllocMemory((size / 2) * sizeof(*(fft_tables->negsintbl[0])));
+        fft_tables->costbl[logm] = (fftfloat *)AllocMemory((size / 2) * sizeof(*(fft_tables->costbl[0])));
+        fft_tables->negsintbl[logm] = (fftfloat *)AllocMemory((size / 2) * sizeof(*(fft_tables->negsintbl[0])));
 
         for (i = 0; i < (size >> 1); i++)
         {

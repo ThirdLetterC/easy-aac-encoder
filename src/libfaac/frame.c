@@ -49,18 +49,18 @@
 #include "version.h"
 
 #if FAAC_RELEASE
-static char *libfaacName = FAAC_VERSION;
+static char *libfaacName = (char *)FAAC_VERSION;
 #else
-static char *libfaacName = FAAC_VERSION ".1 (" __DATE__ ") UNSTABLE";
+static char *libfaacName = (char *)FAAC_VERSION ".1 (" __DATE__ ") UNSTABLE";
 #endif
-static char *libCopyright = "FAAC - Freeware Advanced Audio Coder (http://www.audiocoding.com/)\n"
-                            " Copyright (C) 1999,2000,2001  Menno Bakker\n"
-                            " Copyright (C) 2002,2003  Krzysztof Nikiel\n"
-                            "This software is based on the ISO MPEG-4 reference source code.\n";
+static char *libCopyright = (char *)"FAAC - Freeware Advanced Audio Coder (http://www.audiocoding.com/)\n"
+                                    " Copyright (C) 1999,2000,2001  Menno Bakker\n"
+                                    " Copyright (C) 2002,2003  Krzysztof Nikiel\n"
+                                    "This software is based on the ISO MPEG-4 reference source code.\n";
 
-static const psymodellist_t psymodellist[] = {{&psymodel2, "knipsycho psychoacoustic"}, {NULL}};
+static const psymodellist_t psymodellist[] = {{&psymodel2, (char *)"knipsycho psychoacoustic"}, {NULL, NULL}};
 
-static SR_INFO srInfo[12 + 1];
+extern SR_INFO srInfo[12 + 1];
 
 // base bandwidth for q=100
 static const int bwbase = 16000;
@@ -96,7 +96,7 @@ int FAACAPI faacEncGetDecoderSpecificInfo(faacEncHandle hEncoder, unsigned char 
     }
 
     *pSizeOfDecoderSpecificInfo = 2;
-    *ppBuffer = malloc(2);
+    *ppBuffer = (unsigned char *)malloc(2);
 
     if (*ppBuffer != NULL)
     {
@@ -655,7 +655,8 @@ int FAACAPI faacEncEncode(faacEncHandle hEncoder, int32_t *inputBuffer, unsigned
         if ((!channelInfo[channel].lfe) && (useTns))
         {
             TnsEncode(&(coderInfo[channel].tnsInfo), coderInfo[channel].max_sfb, coderInfo[channel].max_sfb,
-                      coderInfo[channel].block_type, coderInfo[channel].sfb_offset, hEncoder->freqBuff[channel]);
+                      (enum WINDOW_TYPE)coderInfo[channel].block_type, coderInfo[channel].sfb_offset,
+                      hEncoder->freqBuff[channel]);
         }
         else
         {
@@ -817,7 +818,7 @@ int FAACAPI faacEncEncode(faacEncHandle hEncoder, int32_t *inputBuffer, unsigned
 
                 if (tnsDecInfo != NULL)
                     TnsDecodeFilterOnly(&(coderInfo[channel].tnsInfo), coderInfo[channel].nr_of_sfb,
-                                        coderInfo[channel].max_sfb, coderInfo[channel].block_type,
+                                        coderInfo[channel].max_sfb, (enum WINDOW_TYPE)coderInfo[channel].block_type,
                                         coderInfo[channel].sfb_offset, coderInfo[channel].requantFreq);
 
                 IFilterBank(hEncoder, &coderInfo[channel], coderInfo[channel].requantFreq,
@@ -870,7 +871,7 @@ int FAACAPI faacEncEncode(faacEncHandle hEncoder, int32_t *inputBuffer, unsigned
 /* Scalefactorband data table for 960 transform length */
 /* all parameters which are different from the 1024 transform length table are
    marked with an "x" */
-static SR_INFO srInfo[12 + 1] = {
+SR_INFO srInfo[12 + 1] = {
     {96000,
      40 /*x*/,
      12,
@@ -989,10 +990,10 @@ static SR_INFO srInfo[12 + 1] = {
      {
          4, 4, 4, 4, 4, 4, 4, 8, 8, 8, 8, 12, 16, 20, 12 /*x*/
      }},
-    {-1}};
+    {(unsigned long)-1}};
 #else
 /* Scalefactorband data table for 1024 transform length */
-static SR_INFO srInfo[12 + 1] = {
+SR_INFO srInfo[12 + 1] = {
     {96000,
      41,
      12,
@@ -1065,7 +1066,7 @@ static SR_INFO srInfo[12 + 1] = {
      {12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 16, 16, 16, 16, 16, 16, 16,
       20, 20, 20, 20, 24, 24, 24, 28, 28, 32, 36, 36, 40, 44, 48, 52, 56, 60, 64, 80},
      {4, 4, 4, 4, 4, 4, 4, 8, 8, 8, 8, 12, 16, 20, 20}},
-    {-1}};
+    {(unsigned long)-1}};
 #endif
 
 /*

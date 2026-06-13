@@ -21,9 +21,11 @@
 
 #include <math.h>
 #include "channels.h"
+#include "midside.h"
 #include "util.h"
 
-void MSEncode(CoderInfo *coderInfo, ChannelInfo *channelInfo, double *spectrum[MAX_CHANNELS], int maxchan, int allowms)
+void MSEncode(CoderInfo *coderInfo, ChannelInfo *channelInfo, double *spectrum[MAX_CHANNELS],
+              unsigned int maxchan, unsigned int allowms)
 {
     int chn;
 

@@ -24,8 +24,7 @@ bundled through the FAAC source tree.
 ## Requirements
 
 * CMake 3.20 or newer.
-* A C99 compiler for bundled FAAC/Kiss FFT sources.
-* A C++23 compiler for the EasyAACEncoder wrapper code.
+* A C++23 compiler for EasyAACEncoder and the bundled FAAC/Kiss FFT sources.
 * Linux or another POSIX-like environment with `pthread` and `libm`.
 
 
@@ -56,8 +55,9 @@ cmake --build build --target clean-generated
 ```
 
 The `warnings` target compiles project-owned C++23 sources with
-`-Wall -Wextra -Werror`. Vendored FAAC and Kiss FFT C sources are built
-separately and are not forced through the project C++ warning policy.
+`-Wall -Wextra -Werror`. Bundled FAAC and Kiss FFT sources are also compiled
+as C++23 during normal builds, but are not forced through the project
+`-Werror` policy.
 
 
 ## Sample Program

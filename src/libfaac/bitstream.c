@@ -910,7 +910,7 @@ BitStream *OpenBitStream(int size, unsigned char *buffer)
 {
     BitStream *bitStream;
 
-    bitStream = AllocMemory(sizeof(BitStream));
+    bitStream = (BitStream *)AllocMemory(sizeof(BitStream));
     bitStream->size = size;
 #ifdef DRM
     /* skip first byte for CRC */

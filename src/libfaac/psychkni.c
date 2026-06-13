@@ -64,7 +64,7 @@ static void PsyCheckShort(PsyInfo *psyInfo)
 {
     double totvol = 0.0;
     double totchg, totchg2;
-    psydata_t *psydata = psyInfo->data;
+    psydata_t *psydata = (psydata_t *)psyInfo->data;
     int lastband = psydata->lastband;
     int firstband = 1;
     int sfb;
@@ -202,7 +202,7 @@ static void PsyInit(GlobalPsyInfo *gpsyInfo, PsyInfo *psyInfo, unsigned int numC
 
     for (channel = 0; channel < numChannels; channel++)
     {
-        psydata_t *psydata = AllocMemory(sizeof(psydata_t));
+        psydata_t *psydata = (psydata_t *)AllocMemory(sizeof(psydata_t));
         psyInfo[channel].data = psydata;
     }
 
@@ -218,7 +218,7 @@ static void PsyInit(GlobalPsyInfo *gpsyInfo, PsyInfo *psyInfo, unsigned int numC
     size = BLOCK_LEN_SHORT;
     for (channel = 0; channel < numChannels; channel++)
     {
-        psydata_t *psydata = psyInfo[channel].data;
+        psydata_t *psydata = (psydata_t *)psyInfo[channel].data;
 
         psyInfo[channel].sizeS = size;
 
@@ -257,7 +257,7 @@ static void PsyEnd(GlobalPsyInfo *gpsyInfo, PsyInfo *psyInfo, unsigned int numCh
 
     for (channel = 0; channel < numChannels; channel++)
     {
-        psydata_t *psydata = psyInfo[channel].data;
+        psydata_t *psydata = (psydata_t *)psyInfo[channel].data;
 
         if (psyInfo[channel].prevSamplesS)
             FreeMemory(psyInfo[channel].prevSamplesS);
@@ -320,7 +320,7 @@ static void PsyBufferUpdate(FFT_Tables *fft_tables, GlobalPsyInfo *gpsyInfo, Psy
     int win;
     double transBuff[2 * BLOCK_LEN_LONG];
     double transBuffS[2 * BLOCK_LEN_SHORT];
-    psydata_t *psydata = psyInfo->data;
+    psydata_t *psydata = (psydata_t *)psyInfo->data;
     psyfloat *tmp;
     int sfb;
 
