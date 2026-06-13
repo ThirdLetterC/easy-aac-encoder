@@ -6,7 +6,6 @@
 */
 
 #include "IDecodeToPcm.h"
-#include "audio_buffer.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,6 +42,7 @@ DecodeToPcmBase::~DecodeToPcmBase(void)
 
 int DecodeToPcmBase::Init(InAudioInfo info)
 {
+    (void)info;
     m_g7FrameSize = G711_ONE_LEN;
     return 0;
 }

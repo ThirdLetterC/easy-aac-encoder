@@ -14,6 +14,8 @@ class G726ToPcm : public IDecodeToPcm
   public:
     G726ToPcm(void);
     virtual ~G726ToPcm(void);
+    G726ToPcm(const G726ToPcm&) = delete;
+    G726ToPcm& operator=(const G726ToPcm&) = delete;
 
   public:
     int Init(InAudioInfo info);

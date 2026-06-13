@@ -240,10 +240,10 @@ int g711_decode(void *pout_buf, int *pout_len, const void *pin_buf, const int in
 {
     int16_t *dst = (int16_t *)pout_buf;
     uint8_t *src = (uint8_t *)pin_buf;
-    uint32_t i = 0;
+    int i = 0;
     int Ret = 0;
 
-    if ((NULL == pout_buf) || (NULL == pout_len) || (NULL == pin_buf) || (0 == in_len))
+    if ((NULL == pout_buf) || (NULL == pout_len) || (NULL == pin_buf) || (in_len <= 0))
     {
         return -1;
     }

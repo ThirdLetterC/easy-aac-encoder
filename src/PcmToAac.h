@@ -22,10 +22,13 @@ class PcmToAac
   public:
     PcmToAac(void);
     ~PcmToAac(void);
+    PcmToAac(const PcmToAac&) = delete;
+    PcmToAac& operator=(const PcmToAac&) = delete;
 
   public:
     bool Init(InAudioInfo *info);
-    int Encode(int32_t *inputBuffer, unsigned int samplesInput, unsigned char *outputBuffer, unsigned int bufferSize);
+    int Encode(const int32_t *inputBuffer, unsigned int samplesInput, unsigned char *outputBuffer,
+               unsigned int bufferSize);
 
   public:
     unsigned int GetPCMBitSize()

@@ -12,6 +12,17 @@
 #define Easy_APICALL
 
 #define Easy_Handle void*
+#define EasyAACEncoder_Handle Easy_Handle
+
+enum EasyAACEncoderError
+{
+    EasyAACEncoder_InvalidArgument = -1,
+    EasyAACEncoder_InitFailed = -2,
+    EasyAACEncoder_BufferTooSmall = -3,
+    EasyAACEncoder_BufferError = -4,
+    EasyAACEncoder_DecodeFailed = -5,
+    EasyAACEncoder_EncodeFailed = -6
+};
 
 ///* Audio Codec */
 enum Law
@@ -62,9 +73,18 @@ extern "C"
     /* Create AAC Encoder Handle */
     Easy_API Easy_Handle Easy_APICALL Easy_AACEncoder_Init(InitParam initPar);
 
-    /* Input original data, output the encoede AAC data */
+    /*
+     * Input original data, output encoded AAC data.
+     * This legacy API cannot verify the output buffer capacity. New callers
+     * should use Easy_AACEncoder_EncodeEx.
+     */
     Easy_API int Easy_APICALL Easy_AACEncoder_Encode(Easy_Handle handle, unsigned char* inbuf, unsigned int inlen,
                                                      unsigned char* outbuf, unsigned int* outlen);
+
+    /* Capacity-aware AAC encoding API. */
+    Easy_API int Easy_APICALL Easy_AACEncoder_EncodeEx(Easy_Handle handle, const unsigned char* inbuf,
+                                                       unsigned int inlen, unsigned char* outbuf,
+                                                       unsigned int outcap, unsigned int* outlen);
 
     /* Close Encoder Handle */
     Easy_API void Easy_APICALL Easy_AACEncoder_Release(Easy_Handle handle);

@@ -38,3 +38,4 @@ ipch/
 /build/
 src/build
 src/x64/libEasyAACEncoder.a
+dist/

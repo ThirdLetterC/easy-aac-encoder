@@ -13,31 +13,38 @@
 
 #include "EasyAACEncoderAPI.h"
 #include "EasyAACEncoder.h"
-#include "condef.h"
+#include <limits>
 
-Easy_API EasyAACEncoder_Handle Easy_APICALL Easy_AACEncoder_Init(InitParam initPar)
+Easy_API Easy_Handle Easy_APICALL Easy_AACEncoder_Init(InitParam initPar)
 {
     G7ToAac* encoder = new G7ToAac();
     InAudioInfo info(initPar);
-    bool ret = encoder->init(info);
-    if (!ret)
+    if (!encoder->init(info))
     {
-        SAFE_DELETE_OBJ(encoder);
+        delete encoder;
+        encoder = NULL;
     }
     return encoder;
 }
 
-Easy_API int Easy_APICALL Easy_AACEncoder_Encode(EasyAACEncoder_Handle handle, unsigned char* inbuf, unsigned int inlen,
+Easy_API int Easy_APICALL Easy_AACEncoder_Encode(Easy_Handle handle, unsigned char* inbuf, unsigned int inlen,
                                                  unsigned char* outbuf, unsigned int* outlen)
+{
+    return Easy_AACEncoder_EncodeEx(handle, inbuf, inlen, outbuf, std::numeric_limits<unsigned int>::max(), outlen);
+}
+
+Easy_API int Easy_APICALL Easy_AACEncoder_EncodeEx(Easy_Handle handle, const unsigned char* inbuf, unsigned int inlen,
+                                                   unsigned char* outbuf, unsigned int outcap, unsigned int* outlen)
 {
     if (handle == NULL)
     {
-        return -1;
+        return EasyAACEncoder_InvalidArgument;
     }
-    return ((G7ToAac*)handle)->aac_encode(inbuf, inlen, outbuf, outlen);
+
+    return ((G7ToAac*)handle)->aac_encode(inbuf, inlen, outbuf, outcap, outlen);
 }
 
-Easy_API void Easy_APICALL Easy_AACEncoder_Release(EasyAACEncoder_Handle handle)
+Easy_API void Easy_APICALL Easy_AACEncoder_Release(Easy_Handle handle)
 {
     if (handle != NULL)
     {

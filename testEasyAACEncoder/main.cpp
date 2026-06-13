@@ -24,6 +24,8 @@ int TestPcmToAAC();
 
 int main(int argc, char** argv)
 {
+    (void)argc;
+    (void)argv;
     // TestG711ToAAC_private();
     // TestG711ToAAC_standard();
     // TestG726ToAAC();
@@ -33,7 +35,6 @@ int main(int argc, char** argv)
 
 int TestG711ToAAC_standard()
 {
-    int active = 0;
     InitParam initParam;
     initParam.u32AudioSamplerate = 8000;
     initParam.ucAudioChannel = 1;
@@ -42,8 +43,8 @@ int TestG711ToAAC_standard()
     // initParam.ucAudioCodec = Law_ULaw;
 
     Easy_Handle handle = Easy_AACEncoder_Init(initParam);
-    char* infilename = "g711.g711a"; // Standard
-    char* outAacname = "g711.aac";
+    const char* infilename = "g711.g711a"; // Standard
+    const char* outAacname = "g711.aac";
 
     FILE* fpIn = fopen(infilename, "rb");
     if (NULL == fpIn)
@@ -95,7 +96,6 @@ static unsigned long long os_get_reltime(void)
 
 int TestG726ToAAC()
 {
-    int active = 0;
     InitParam initParam;
     initParam.u32AudioSamplerate = 8000;
     initParam.ucAudioChannel = 1;
@@ -113,8 +113,8 @@ int TestG726ToAAC()
     // char* outAacname = "encode_out_24.aac";
     // char* infilename = "encode_out_32.g726";
     // char* outAacname = "encode_out_32.aac";
-    char* infilename = "encode_out_40.g726";
-    char* outAacname = "encode_out_40.aac";
+    const char* infilename = "encode_out_40.g726";
+    const char* outAacname = "encode_out_40.aac";
 
     FILE* fpIn = fopen(infilename, "rb");
     if (NULL == fpIn)
@@ -164,7 +164,6 @@ int TestG726ToAAC()
 
 int TestPcmToAAC()
 {
-    int active = 0;
     InitParam initParam;
     initParam.u32AudioSamplerate = 44100;
     initParam.ucAudioChannel = 2;
@@ -182,8 +181,8 @@ int TestPcmToAAC()
     // char* outAacname = "encode_out_24.aac";
     // char* infilename = "encode_out_32.g726";
     // char* outAacname = "encode_out_32.aac";
-    char* infilename = "playback.pcm";
-    char* outAacname = "playback.aac";
+    const char* infilename = "playback.pcm";
+    const char* outAacname = "playback.aac";
 
     FILE* fpIn = fopen(infilename, "rb");
     if (NULL == fpIn)
