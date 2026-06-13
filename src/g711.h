@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 enum _e_g711_tp
 {
     TP_ALAW, // G711A

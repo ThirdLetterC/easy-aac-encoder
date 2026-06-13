@@ -9,6 +9,8 @@
 
 #include "g711.h"
 
+#include <cstdint>
+
 unsigned short G711AToPcm::DecodeOneChar(unsigned char data) noexcept
 {
     return static_cast<unsigned short>(static_cast<int16_t>(alaw2linear(data)));

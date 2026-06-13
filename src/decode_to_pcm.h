@@ -9,8 +9,6 @@
 
 #include "EasyAACEncoderAPI.h"
 
-#include <cstdint>
-
 inline constexpr int G711_ONE_LEN = 160;
 inline constexpr int G711_ONE_OFFSET = 0;
 inline constexpr int CON_PCM_SIZE = 320;
