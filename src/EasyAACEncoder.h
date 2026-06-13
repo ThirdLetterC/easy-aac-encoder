@@ -27,7 +27,7 @@ class G7ToAac
     ~G7ToAac();
 
     bool init();
-    bool init(InAudioInfo info);
+    bool init(const InAudioInfo& info);
 
     int aac_encode(const unsigned char* inbuf, unsigned int inlen, unsigned char* outbuf, unsigned int outcap,
                    unsigned int* outlen);

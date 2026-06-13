@@ -73,7 +73,6 @@ unsigned char linear2alaw(int pcm_val) /* 2's complement (16-bit range) */
 {
     int mask;
     int seg;
-    unsigned char aval;
 
     if (pcm_val >= 0)
     {
@@ -94,7 +93,7 @@ unsigned char linear2alaw(int pcm_val) /* 2's complement (16-bit range) */
         return (0x7F ^ mask);
     else
     {
-        aval = seg << SEG_SHIFT;
+        unsigned char aval = seg << SEG_SHIFT;
         if (seg < 2)
             aval |= (pcm_val >> 4) & QUANT_MASK;
         else
@@ -166,7 +165,6 @@ unsigned char linear2ulaw(int pcm_val) /* 2's complement (16-bit range) */
 {
     int mask;
     int seg;
-    unsigned char uval;
 
     /* Get the sign and the magnitude of the value. */
     if (pcm_val < 0)
@@ -191,7 +189,7 @@ unsigned char linear2ulaw(int pcm_val) /* 2's complement (16-bit range) */
         return (0x7F ^ mask);
     else
     {
-        uval = (seg << 4) | ((pcm_val >> (seg + 3)) & 0xF);
+        unsigned char uval = (seg << 4) | ((pcm_val >> (seg + 3)) & 0xF);
         return (uval ^ mask);
     }
 }
@@ -238,8 +236,8 @@ unsigned char ulaw2alaw(unsigned char uval)
 
 int g711_decode(void *pout_buf, int *pout_len, const void *pin_buf, const int in_len, int type)
 {
-    int16_t *dst = (int16_t *)pout_buf;
-    uint8_t *src = (uint8_t *)pin_buf;
+    int16_t *dst = reinterpret_cast<int16_t *>(pout_buf);
+    const uint8_t *src = reinterpret_cast<const uint8_t *>(pin_buf);
     int i = 0;
     int Ret = 0;
 

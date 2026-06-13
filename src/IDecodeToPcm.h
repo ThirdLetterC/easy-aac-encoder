@@ -31,44 +31,31 @@ class InAudioInfo
 {
   public:
     InAudioInfo();
-    InAudioInfo(InitParam param);
-    ~InAudioInfo()
-    {
-        ;
-    }
+    explicit InAudioInfo(InitParam param);
+    ~InAudioInfo() = default;
 
-    unsigned int CodecType()
+    unsigned int CodecType() const
     {
         return m_initparam.ucAudioCodec;
-        // return m_u32AudioCodec;
     }
-    unsigned int Samplerate()
+    unsigned int Samplerate() const
     {
         return m_initparam.u32AudioSamplerate;
-        // return m_u32AudioSamplerate;
     }
-    unsigned int Channel()
+    unsigned int Channel() const
     {
         return m_initparam.ucAudioChannel;
-        // return m_u32AudioChannel;
     }
-    unsigned int PCMBitSize()
+    unsigned int PCMBitSize() const
     {
         return m_initparam.u32PCMBitSize;
-        // return m_nPCMBitSize;
     }
-    unsigned char G726RateBits()
+    unsigned char G726RateBits() const
     {
         return m_initparam.g726param.ucRateBits;
     }
 
   private:
-    unsigned int m_u32AudioCodec;
-    unsigned int m_u32AudioSamplerate;
-    unsigned int m_u32AudioChannel;
-
-    unsigned int m_nPCMBitSize;
-
     InitParam m_initparam;
 };
 //----------------------------------------------------------
@@ -80,7 +67,7 @@ class IDecodeToPcm
 
   public:
     virtual int Init(InAudioInfo info) = 0;
-    virtual int Decode(unsigned char* outbuf, unsigned int* outlen, unsigned char* inbuf, unsigned int inlen) = 0;
+    virtual int Decode(unsigned char* outbuf, unsigned int* outlen, const unsigned char* inbuf, unsigned int inlen) = 0;
     virtual int PCMSize() = 0;
     virtual int G7FrameSize() = 0;
 };
@@ -93,12 +80,12 @@ class DecodeToPcmBase : public IDecodeToPcm
     DecodeToPcmBase();
     virtual ~DecodeToPcmBase();
 
-    int Init(InAudioInfo info);
+    int Init(InAudioInfo info) override;
 
   public:
-    virtual int Decode(unsigned char* outbuf, unsigned int* outlen, unsigned char* inbuf, unsigned int inlen);
-    virtual int PCMSize();
-    virtual int G7FrameSize();
+    int Decode(unsigned char* outbuf, unsigned int* outlen, const unsigned char* inbuf, unsigned int inlen) override;
+    int PCMSize() override;
+    int G7FrameSize() override;
 
     virtual unsigned short DecodeOneChar(unsigned char data) = 0;
 

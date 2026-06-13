@@ -46,7 +46,7 @@ bool G7ToAac::init()
     return CreateBuffer();
 }
 
-bool G7ToAac::init(InAudioInfo info)
+bool G7ToAac::init(const InAudioInfo& info)
 {
     m_inAudioInfo = info;
 

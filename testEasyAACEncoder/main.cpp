@@ -5,12 +5,9 @@
     Website: http://www.easydarwin.org
 */
 
-#include <iostream>
 #include "EasyAACEncoderAPI.h"
 #include <stdio.h>
-#include <stdlib.h>
-
-using namespace std;
+#include <vector>
 
 // #define TEST_G711A_FILE       "src.g711a"  // Private
 #define TEST_G711A_FILE "g711.g711a" // Standard
@@ -43,6 +40,11 @@ int TestG711ToAAC_standard()
     // initParam.ucAudioCodec = Law_ULaw;
 
     Easy_Handle handle = Easy_AACEncoder_Init(initParam);
+    if (handle == NULL)
+    {
+        printf("%s:[%d] init encoder failed\n", __FUNCTION__, __LINE__);
+        return -1;
+    }
     const char* infilename = "g711.g711a"; // Standard
     const char* outAacname = "g711.aac";
 
@@ -50,6 +52,7 @@ int TestG711ToAAC_standard()
     if (NULL == fpIn)
     {
         printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, infilename);
+        Easy_AACEncoder_Release(handle);
         return -1;
     }
 
@@ -57,28 +60,29 @@ int TestG711ToAAC_standard()
     if (NULL == fpOut)
     {
         printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, outAacname);
+        fclose(fpIn);
+        Easy_AACEncoder_Release(handle);
         return -1;
     }
 
-    int gBytesRead = 0;
-    int bG711ABufferSize = 500;
-    int bAACBufferSize = 4 * bG711ABufferSize; // Provide a sufficiently large buffer
-    unsigned char* pbG711ABuffer = (unsigned char*)malloc(bG711ABufferSize * sizeof(unsigned char));
-    unsigned char* pbAACBuffer = (unsigned char*)malloc(bAACBufferSize * sizeof(unsigned char));
+    const unsigned int bG711ABufferSize = 500;
+    const unsigned int bAACBufferSize = 4 * bG711ABufferSize; // Provide a sufficiently large buffer
+    std::vector<unsigned char> pbG711ABuffer(bG711ABufferSize);
+    std::vector<unsigned char> pbAACBuffer(bAACBufferSize);
     unsigned int out_len = 0;
 
-    while ((gBytesRead = fread(pbG711ABuffer, 1, bG711ABufferSize, fpIn)) > 0)
+    size_t gBytesRead = 0;
+    while ((gBytesRead = fread(pbG711ABuffer.data(), 1, pbG711ABuffer.size(), fpIn)) > 0)
     {
-        if (Easy_AACEncoder_Encode(handle, pbG711ABuffer, gBytesRead, pbAACBuffer, &out_len) > 0)
+        if (Easy_AACEncoder_Encode(handle, pbG711ABuffer.data(), static_cast<unsigned int>(gBytesRead),
+                                   pbAACBuffer.data(), &out_len) > 0)
         {
-            fwrite(pbAACBuffer, 1, out_len, fpOut);
+            fwrite(pbAACBuffer.data(), 1, out_len, fpOut);
         }
     }
 
     Easy_AACEncoder_Release(handle);
 
-    free(pbG711ABuffer);
-    free(pbAACBuffer);
     fclose(fpIn);
     fclose(fpOut);
 
@@ -107,6 +111,11 @@ int TestG726ToAAC()
     initParam.g726param.ucRateBits = Rate40kBits;
 
     Easy_Handle handle = Easy_AACEncoder_Init(initParam);
+    if (handle == NULL)
+    {
+        printf("%s:[%d] init encoder failed\n", __FUNCTION__, __LINE__);
+        return -1;
+    }
     // char* infilename = "encode_out_16.g726";
     // char* outAacname = "encode_out_16.aac";
     // char* infilename = "encode_out_24.g726";
@@ -120,6 +129,7 @@ int TestG726ToAAC()
     if (NULL == fpIn)
     {
         printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, infilename);
+        Easy_AACEncoder_Release(handle);
         return -1;
     }
 
@@ -127,23 +137,26 @@ int TestG726ToAAC()
     if (NULL == fpOut)
     {
         printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, outAacname);
+        fclose(fpIn);
+        Easy_AACEncoder_Release(handle);
         return -1;
     }
 
-    int gBytesRead = 0;
-    int bG726BufferSize = 40000 / 8 / 25;
-    int bAACBufferSize = 4 * bG726BufferSize; // Provide a sufficiently large buffer
-    unsigned char* pbG726Buffer = (unsigned char*)malloc(bG726BufferSize * sizeof(unsigned char));
-    unsigned char* pbAACBuffer = (unsigned char*)malloc(bAACBufferSize * sizeof(unsigned char));
+    const unsigned int bG726BufferSize = 40000 / 8 / 25;
+    const unsigned int bAACBufferSize = 4 * bG726BufferSize; // Provide a sufficiently large buffer
+    std::vector<unsigned char> pbG726Buffer(bG726BufferSize);
+    std::vector<unsigned char> pbAACBuffer(bAACBufferSize);
     unsigned int out_len = 0;
     unsigned long long ts = os_get_reltime();
 
-    while ((gBytesRead = fread(pbG726Buffer, 1, bG726BufferSize, fpIn)) > 0)
+    size_t gBytesRead = 0;
+    while ((gBytesRead = fread(pbG726Buffer.data(), 1, pbG726Buffer.size(), fpIn)) > 0)
     {
-        if (Easy_AACEncoder_Encode(handle, pbG726Buffer, gBytesRead, pbAACBuffer, &out_len) > 0)
+        if (Easy_AACEncoder_Encode(handle, pbG726Buffer.data(), static_cast<unsigned int>(gBytesRead),
+                                   pbAACBuffer.data(), &out_len) > 0)
         {
-            fwrite(pbAACBuffer, 1, out_len, fpOut);
-            printf("%s:[%d] pbAACBuffer(%d) len=%d \n", __FUNCTION__, __LINE__, bAACBufferSize, out_len);
+            fwrite(pbAACBuffer.data(), 1, out_len, fpOut);
+            printf("%s:[%d] pbAACBuffer(%u) len=%u \n", __FUNCTION__, __LINE__, bAACBufferSize, out_len);
         }
         while (os_get_reltime() < ts + 1000000 / 25)
         {
@@ -154,8 +167,6 @@ int TestG726ToAAC()
 
     Easy_AACEncoder_Release(handle);
 
-    free(pbG726Buffer);
-    free(pbAACBuffer);
     fclose(fpIn);
     fclose(fpOut);
 
@@ -175,6 +186,11 @@ int TestPcmToAAC()
     // initParam.g726param.ucRateBits=Rate40kBits;
 
     Easy_Handle handle = Easy_AACEncoder_Init(initParam);
+    if (handle == NULL)
+    {
+        printf("%s:[%d] init encoder failed\n", __FUNCTION__, __LINE__);
+        return -1;
+    }
     // char* infilename = "encode_out_16.g726";
     // char* outAacname = "encode_out_16.aac";
     // char* infilename = "encode_out_24.g726";
@@ -188,6 +204,7 @@ int TestPcmToAAC()
     if (NULL == fpIn)
     {
         printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, infilename);
+        Easy_AACEncoder_Release(handle);
         return -1;
     }
 
@@ -195,34 +212,30 @@ int TestPcmToAAC()
     if (NULL == fpOut)
     {
         printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, outAacname);
+        fclose(fpIn);
+        Easy_AACEncoder_Release(handle);
         return -1;
     }
 
-    int gBytesRead = 0;
-    int bPcmBufferSize = 44100 * 2 * 16 / 8 / 25;
-    int bAACBufferSize = 4 * bPcmBufferSize; // Provide a sufficiently large buffer
-    unsigned char* pbPcmBuffer = (unsigned char*)malloc(bPcmBufferSize * sizeof(unsigned char));
-    unsigned char* pbAACBuffer = (unsigned char*)malloc(bAACBufferSize * sizeof(unsigned char));
+    const unsigned int bPcmBufferSize = 44100 * 2 * 16 / 8 / 25;
+    const unsigned int bAACBufferSize = 4 * bPcmBufferSize; // Provide a sufficiently large buffer
+    std::vector<unsigned char> pbPcmBuffer(bPcmBufferSize);
+    std::vector<unsigned char> pbAACBuffer(bAACBufferSize);
     unsigned int out_len = 0;
-    unsigned long long ts = os_get_reltime();
 
-    while ((gBytesRead = fread(pbPcmBuffer, 1, bPcmBufferSize, fpIn)) > 0)
+    size_t gBytesRead = 0;
+    while ((gBytesRead = fread(pbPcmBuffer.data(), 1, pbPcmBuffer.size(), fpIn)) > 0)
     {
-        if ((Easy_AACEncoder_Encode(handle, pbPcmBuffer, gBytesRead, pbAACBuffer, &out_len)) > 0)
+        if ((Easy_AACEncoder_Encode(handle, pbPcmBuffer.data(), static_cast<unsigned int>(gBytesRead),
+                                    pbAACBuffer.data(), &out_len)) > 0)
         {
-            fwrite(pbAACBuffer, 1, out_len, fpOut);
-            printf("%s:[%d] pbAACBuffer(%d) len=%d \n", __FUNCTION__, __LINE__, bAACBufferSize, out_len);
+            fwrite(pbAACBuffer.data(), 1, out_len, fpOut);
+            printf("%s:[%d] pbAACBuffer(%u) len=%u \n", __FUNCTION__, __LINE__, bAACBufferSize, out_len);
         }
-        // while (os_get_reltime() < ts + 1000000/25) {
-        //	usleep(1000000/25);
-        // }
-        ts += 1000000 / 25;
     }
 
     Easy_AACEncoder_Release(handle);
 
-    free(pbPcmBuffer);
-    free(pbAACBuffer);
     fclose(fpIn);
     fclose(fpOut);
 

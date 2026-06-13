@@ -26,7 +26,7 @@ class PcmToAac
     PcmToAac& operator=(const PcmToAac&) = delete;
 
   public:
-    bool Init(InAudioInfo *info);
+    bool Init(const InAudioInfo *info);
     int Encode(const int32_t *inputBuffer, unsigned int samplesInput, unsigned char *outputBuffer,
                unsigned int bufferSize);
 

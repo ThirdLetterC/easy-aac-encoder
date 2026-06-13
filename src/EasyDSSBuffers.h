@@ -12,15 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <list>
 
 #include <errno.h>
-
-#include <string>
-#include <stdlib.h>
-#include <map>
-
-using namespace std;
 
 #define PFRAME 0x00
 #define IFRAME 0x01
@@ -95,9 +88,9 @@ typedef struct _buffers_t
     void *pUserData;                 // Callback user data
 
     _buffers_t()
+        : rear(0), front(0), bufnum(0), fps(0), pOnVideoData(NULL), pUserData(NULL)
     {
-        pOnVideoData = NULL;
-        pUserData = NULL;
+        memset(buf, 0, sizeof(buf));
     }
 
 } buffers_t;
@@ -108,7 +101,7 @@ int free_buffers(buffers_t *bufs);
 
 int buffers_get_data(void *data, unsigned int *length, buffers_t *bufs, int *type, int *channel, int *frame_index);
 
-int buffers_put_data(void *data, unsigned int length, buffers_t *bufs, int type, int channel, int frame_index);
+int buffers_put_data(const void *data, unsigned int length, buffers_t *bufs, int type, int channel, int frame_index);
 
 void buffers_clear_data(buffers_t *bufs);
 

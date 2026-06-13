@@ -18,12 +18,12 @@ class G726ToPcm : public IDecodeToPcm
     G726ToPcm& operator=(const G726ToPcm&) = delete;
 
   public:
-    int Init(InAudioInfo info);
+    int Init(InAudioInfo info) override;
 
   public:
-    virtual int Decode(unsigned char* outbuf, unsigned int* outlen, unsigned char* inbuf, unsigned int inlen);
-    virtual int PCMSize();
-    virtual int G7FrameSize();
+    int Decode(unsigned char* outbuf, unsigned int* outlen, const unsigned char* inbuf, unsigned int inlen) override;
+    int PCMSize() override;
+    int G7FrameSize() override;
 
   private:
     g726_state_t* m_state726;

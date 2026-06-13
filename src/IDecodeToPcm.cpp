@@ -33,6 +33,7 @@ InAudioInfo::InAudioInfo(InitParam param) : m_initparam(param)
 //------------------------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 DecodeToPcmBase::DecodeToPcmBase(void)
+    : m_g7FrameSize(0)
 {
 }
 
@@ -54,11 +55,11 @@ int DecodeToPcmBase::G7FrameSize()
 {
     return m_g7FrameSize;
 }
-int DecodeToPcmBase::Decode(unsigned char *pout_buf, unsigned int *pout_len, unsigned char *pin_buf,
+int DecodeToPcmBase::Decode(unsigned char *pout_buf, unsigned int *pout_len, const unsigned char *pin_buf,
                             unsigned int in_len)
 {
-    int16_t *dst = (int16_t *)pout_buf;
-    uint8_t *src = (uint8_t *)pin_buf;
+    int16_t *dst = reinterpret_cast<int16_t *>(pout_buf);
+    const uint8_t *src = reinterpret_cast<const uint8_t *>(pin_buf);
     uint32_t i = 0;
     int Ret = 0;
 
@@ -83,5 +84,4 @@ int DecodeToPcmBase::Decode(unsigned char *pout_buf, unsigned int *pout_len, uns
 
     Ret = 2 * in_len;
     return Ret;
-    return 0;
 }

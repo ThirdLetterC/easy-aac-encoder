@@ -9,7 +9,7 @@
 #include "condef.h"
 
 G726ToPcm::G726ToPcm(void)
-    : m_state726(NULL), m_bitRate(0), m_g7FrameSize(0), m_pcmSize(0)
+    : m_state726(nullptr), m_bitRate(0), m_g7FrameSize(0), m_pcmSize(0)
 {
 }
 
@@ -21,8 +21,8 @@ G726ToPcm::~G726ToPcm(void)
 int G726ToPcm::Init(InAudioInfo info)
 {
     m_g7FrameSize = G711_ONE_LEN;
-    m_state726 = (g726_state_t*)malloc(sizeof(g726_state_t));
-    if (m_state726 == NULL)
+    m_state726 = static_cast<g726_state_t*>(malloc(sizeof(g726_state_t)));
+    if (m_state726 == nullptr)
     {
         return -1;
     }
@@ -51,12 +51,12 @@ int G726ToPcm::Init(InAudioInfo info)
     }
 
     m_state726 = g726_init(m_state726, m_bitRate);
-    return (m_state726 == NULL) ? -1 : 0;
+    return (m_state726 == nullptr) ? -1 : 0;
 }
 
-int G726ToPcm::Decode(unsigned char* outbuf, unsigned int* outlen, unsigned char* inbuf, unsigned int inlen)
+int G726ToPcm::Decode(unsigned char* outbuf, unsigned int* outlen, const unsigned char* inbuf, unsigned int inlen)
 {
-    if (m_state726 == NULL || outbuf == NULL || outlen == NULL || inbuf == NULL || inlen == 0)
+    if (m_state726 == nullptr || outbuf == nullptr || outlen == nullptr || inbuf == nullptr || inlen == 0)
     {
         return -1;
     }
@@ -65,7 +65,7 @@ int G726ToPcm::Decode(unsigned char* outbuf, unsigned int* outlen, unsigned char
         return -2;
     }
 
-    int decoded_samples = g726_decode(m_state726, (short*)outbuf, inbuf, inlen);
+    int decoded_samples = g726_decode(m_state726, reinterpret_cast<short*>(outbuf), inbuf, inlen);
     if (decoded_samples < 0)
     {
         return -1;

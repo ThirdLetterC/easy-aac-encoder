@@ -10,7 +10,7 @@
 #include "outDebug.h"
 
 PcmToAac::PcmToAac(void)
-    : hEncoder(NULL), pConfiguration(NULL)
+    : hEncoder(nullptr), pConfiguration(nullptr)
 {
     m_nInputSamples = 0;
     m_nMaxOutputBytes = 0;
@@ -19,16 +19,16 @@ PcmToAac::PcmToAac(void)
 
 PcmToAac::~PcmToAac(void)
 {
-    if (NULL != hEncoder)
+    if (hEncoder != nullptr)
     {
         /*Close FAAC engine*/
         faacEncClose(hEncoder);
     }
 }
 
-bool PcmToAac::Init(InAudioInfo* info)
+bool PcmToAac::Init(const InAudioInfo* info)
 {
-    if (info == NULL || info->Channel() == 0 || info->Samplerate() == 0 || info->PCMBitSize() != 16)
+    if (info == nullptr || info->Channel() == 0 || info->Samplerate() == 0 || info->PCMBitSize() != 16)
     {
         return false;
     }
@@ -47,7 +47,7 @@ bool PcmToAac::Init(InAudioInfo* info)
 
     /*open FAAC engine*/
     hEncoder = faacEncOpen(nSampleRate, nChannels, &nInputSamples, &nMaxOutputBytes);
-    if (hEncoder == NULL)
+    if (hEncoder == nullptr)
     {
         if (AAC_DEBUG)
             printf("%s:[%d] failed to call faacEncOpen !\n", __FUNCTION__, __LINE__);
@@ -59,10 +59,10 @@ bool PcmToAac::Init(InAudioInfo* info)
 
     /*get current encoding configuration*/
     pConfiguration = faacEncGetCurrentConfiguration(hEncoder);
-    if (pConfiguration == NULL)
+    if (pConfiguration == nullptr)
     {
         faacEncClose(hEncoder);
-        hEncoder = NULL;
+        hEncoder = nullptr;
         return false;
     }
     pConfiguration->inputFormat = FAAC_INPUT_16BIT;
@@ -77,7 +77,7 @@ bool PcmToAac::Init(InAudioInfo* info)
     if (!faacEncSetConfiguration(hEncoder, pConfiguration))
     {
         faacEncClose(hEncoder);
-        hEncoder = NULL;
+        hEncoder = nullptr;
         return false;
     }
 
@@ -87,7 +87,7 @@ bool PcmToAac::Init(InAudioInfo* info)
 int PcmToAac::Encode(const int32_t* pbPCMBuffer, unsigned int nPCMBufferSize, unsigned char* pbAACBuffer,
                      unsigned int nMaxOutputBytes)
 {
-    if (hEncoder == NULL || pbPCMBuffer == NULL || pbAACBuffer == NULL || nMaxOutputBytes == 0)
+    if (hEncoder == nullptr || pbPCMBuffer == nullptr || pbAACBuffer == nullptr || nMaxOutputBytes == 0)
     {
         return EasyAACEncoder_InvalidArgument;
     }
@@ -97,7 +97,7 @@ int PcmToAac::Encode(const int32_t* pbPCMBuffer, unsigned int nPCMBufferSize, un
     unsigned int nInputSamples = (nPCMBufferSize / (nPCMBitSize / 8));
     if (AAC_DEBUG)
         printf("%s:[%d] G711A -> PCM faacEncEncode....\n", __FUNCTION__, __LINE__);
-    int nRet = faacEncEncode(hEncoder, (int32_t*)pbPCMBuffer, nInputSamples, pbAACBuffer, nMaxOutputBytes);
+    int nRet = faacEncEncode(hEncoder, const_cast<int32_t*>(pbPCMBuffer), nInputSamples, pbAACBuffer, nMaxOutputBytes);
     if (AAC_DEBUG)
         printf("%s:[%d] G711A -> PCM faacEncEncode\n", __FUNCTION__, __LINE__);
 

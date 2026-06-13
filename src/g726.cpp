@@ -62,7 +62,6 @@ static __inline int top_bit(unsigned int bits)
     }
     if (bits & 0xAAAAAAAA)
     {
-        bits &= 0xAAAAAAAA;
         res += 1;
     }
     return res;
@@ -169,7 +168,7 @@ static short fmult(short an, short srn)
 /*
  * Compute the estimated signal from the 6-zero predictor.
  */
-static __inline short predictor_zero(g726_state_t *s)
+static __inline short predictor_zero(const g726_state_t *s)
 {
     int i;
     int sezi;
@@ -185,9 +184,16 @@ static __inline short predictor_zero(g726_state_t *s)
 /*
  * Computes the estimated signal from the 2-pole predictor.
  */
-static __inline short predictor_pole(g726_state_t *s)
+static __inline short predictor_pole(const g726_state_t *s)
 {
     return (fmult(s->a[1] >> 2, s->sr[1]) + fmult(s->a[0] >> 2, s->sr[0]));
+}
+
+static __inline short arithmetic_shift_right_5(short value)
+{
+    if (value >= 0)
+        return value >> 5;
+    return (short)(-(((-value) + 31) / 32));
 }
 
 /*
@@ -251,9 +257,6 @@ static void update(g726_state_t *s, int y, /* quantizer step size */
     short mag;
     short exp;
     short a2p;  /* LIMC */
-    short a1ul; /* UPA1 */
-    short pks1; /* UPA2 */
-    short fa1;
     short ylint;
     short dqthr;
     short ylfrac;
@@ -318,20 +321,20 @@ static void update(g726_state_t *s, int y, /* quantizer step size */
     {
         /* Update the a's and b's */
         /* UPA2 */
-        pks1 = pk0 ^ s->pk[0];
+        short pks1 = pk0 ^ s->pk[0];
 
         /* Update predictor pole a[1] */
         a2p = s->a[1] - (s->a[1] >> 7);
         if (dqsez != 0)
         {
-            fa1 = (pks1) ? s->a[0] : -s->a[0];
+            short fa1 = (pks1) ? s->a[0] : -s->a[0];
             /* a2p = function of fa1 */
             if (fa1 < -8191)
                 a2p -= 0x100;
             else if (fa1 > 8191)
                 a2p += 0xFF;
             else
-                a2p += fa1 >> 5;
+                a2p += arithmetic_shift_right_5(fa1);
 
             if (pk0 ^ s->pk[1])
             {
@@ -365,7 +368,7 @@ static void update(g726_state_t *s, int y, /* quantizer step size */
                 s->a[0] -= 192;
         }
         /* LIMD */
-        a1ul = 15360 - a2p;
+        short a1ul = 15360 - a2p;
         if (s->a[0] < -a1ul)
             s->a[0] = -a1ul;
         else if (s->a[0] > a1ul)
@@ -791,9 +794,6 @@ int g726_decode(g726_state_t *s, short amp[], const unsigned char g726_data[], i
 {
     int i;
     int samples;
-    unsigned char code;
-    int sl;
-
     for (samples = i = 0;;)
     {
         if (s->bs.residue < s->bits_per_sample)
@@ -803,12 +803,12 @@ int g726_decode(g726_state_t *s, short amp[], const unsigned char g726_data[], i
             s->bs.bitstream = (s->bs.bitstream << 8) | g726_data[i++];
             s->bs.residue += 8;
         }
-        code = (unsigned char)((s->bs.bitstream >> (s->bs.residue - s->bits_per_sample)) &
-                               ((1 << s->bits_per_sample) - 1));
+        unsigned char code = (unsigned char)((s->bs.bitstream >> (s->bs.residue - s->bits_per_sample)) &
+                                             ((1 << s->bits_per_sample) - 1));
 
         s->bs.residue -= s->bits_per_sample;
 
-        sl = s->dec_func(s, code);
+        int sl = s->dec_func(s, code);
 
         amp[samples++] = (short)sl;
     }
@@ -819,14 +819,11 @@ int g726_encode(g726_state_t *s, unsigned char g726_data[], const short amp[], i
 {
     int i;
     int g726_bytes;
-    short sl;
-    unsigned char code;
-
     for (g726_bytes = i = 0; i < len; i++)
     {
-        sl = amp[i] >> 2;
+        short sl = amp[i] >> 2;
 
-        code = s->enc_func(s, sl);
+        unsigned char code = s->enc_func(s, sl);
 
         s->bs.bitstream = (s->bs.bitstream << s->bits_per_sample) | code;
         s->bs.residue += s->bits_per_sample;

@@ -23,7 +23,7 @@ int init_buffers(buffers_t *bufs, int bufsize, int bufnum)
     for (i = 0; i < bufs->bufnum; i++)
     {
         bufs->buf[i].length = 0;
-        bufs->buf[i].start = (char *)calloc(1, bufsize);
+        bufs->buf[i].start = static_cast<char *>(calloc(1, bufsize));
         bufs->buf[i].frame_type = -1;
         bufs->buf[i].channel = -1;
         bufs->buf[i].frame_index = 0;
@@ -64,7 +64,7 @@ int buffers_get_data(void *data, unsigned int *length, buffers_t *bufs, int *typ
     return res;
 }
 
-int buffers_put_data(void *data, unsigned int length, buffers_t *bufs, int type, int channel, int frame_index)
+int buffers_put_data(const void *data, unsigned int length, buffers_t *bufs, int type, int channel, int frame_index)
 {
     int res = 0;
     pthread_mutex_lock(&(bufs->mutex));
@@ -86,7 +86,7 @@ int buffers_put_data(void *data, unsigned int length, buffers_t *bufs, int type,
         else
         {
             // WriteSystemLog("DataRecv.log", "Frame is too large");
-            printf("Frame is too large, length=%d\r\n", length);
+            printf("Frame is too large, length=%u\r\n", length);
         }
         bufs->rear = (bufs->rear + 1) % bufs->bufnum;
         res = 1;

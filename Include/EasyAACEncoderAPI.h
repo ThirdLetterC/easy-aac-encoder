@@ -78,7 +78,7 @@ extern "C"
      * This legacy API cannot verify the output buffer capacity. New callers
      * should use Easy_AACEncoder_EncodeEx.
      */
-    Easy_API int Easy_APICALL Easy_AACEncoder_Encode(Easy_Handle handle, unsigned char* inbuf, unsigned int inlen,
+    Easy_API int Easy_APICALL Easy_AACEncoder_Encode(Easy_Handle handle, const unsigned char* inbuf, unsigned int inlen,
                                                      unsigned char* outbuf, unsigned int* outlen);
 
     /* Capacity-aware AAC encoding API. */
