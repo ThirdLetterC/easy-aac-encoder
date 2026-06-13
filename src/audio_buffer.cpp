@@ -2,19 +2,16 @@
 #include "EasyDSSBuffers.h"
 #include "outDebug.h"
 #include <algorithm>
+#include <cstring>
 
 audio_buffer::audio_buffer()
-    : data_(iBufLen), len_(0)
-{
-}
-
-audio_buffer::~audio_buffer()
+    : data_(iBufLen)
 {
 }
 
 int audio_buffer::write_data(const void* data, int len)
 {
-    if (data == NULL || len < 0)
+    if (data == nullptr || len < 0)
     {
         return -1;
     }
@@ -26,7 +23,7 @@ int audio_buffer::write_data(const void* data, int len)
     }
     if (len > 0)
     {
-        memcpy(data_.data() + len_, data, len);
+        std::memcpy(data_.data() + len_, data, len);
         len_ += len;
         return len;
     }
@@ -35,7 +32,7 @@ int audio_buffer::write_data(const void* data, int len)
 
 int audio_buffer::get_data(unsigned char* dest, int how_you_want)
 {
-    if (dest == NULL || how_you_want <= 0)
+    if (dest == nullptr || how_you_want <= 0)
     {
         return -1;
     }
@@ -45,8 +42,8 @@ int audio_buffer::get_data(unsigned char* dest, int how_you_want)
     }
     else
     {
-        memcpy(dest, data_.data(), how_you_want);
-        memmove(data_.data(), data_.data() + how_you_want, len_ - how_you_want);
+        std::copy_n(data_.data(), how_you_want, dest);
+        std::move(data_.begin() + how_you_want, data_.begin() + len_, data_.begin());
         len_ -= how_you_want;
         return how_you_want;
     }

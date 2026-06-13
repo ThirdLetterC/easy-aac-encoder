@@ -6,7 +6,8 @@
 */
 
 #include "EasyAACEncoderAPI.h"
-#include <stdio.h>
+#include <cstdio>
+#include <memory>
 #include <vector>
 
 // #define TEST_G711A_FILE       "src.g711a"  // Private
@@ -19,10 +20,26 @@ int TestG711ToAAC_standard();
 int TestG726ToAAC();
 int TestPcmToAAC();
 
-int main(int argc, char** argv)
+struct FileCloser
 {
-    (void)argc;
-    (void)argv;
+    void operator()(FILE* file) const
+    {
+        if (file != nullptr)
+        {
+            std::fclose(file);
+        }
+    }
+};
+
+using FilePtr = std::unique_ptr<FILE, FileCloser>;
+
+static FilePtr open_file(const char* path, const char* mode)
+{
+    return FilePtr(std::fopen(path, mode));
+}
+
+int main(int, char**)
+{
     // TestG711ToAAC_private();
     // TestG711ToAAC_standard();
     // TestG726ToAAC();
@@ -40,27 +57,26 @@ int TestG711ToAAC_standard()
     // initParam.ucAudioCodec = Law_ULaw;
 
     Easy_Handle handle = Easy_AACEncoder_Init(initParam);
-    if (handle == NULL)
+    if (handle == nullptr)
     {
-        printf("%s:[%d] init encoder failed\n", __FUNCTION__, __LINE__);
+        std::printf("%s:[%d] init encoder failed\n", __FUNCTION__, __LINE__);
         return -1;
     }
     const char* infilename = "g711.g711a"; // Standard
     const char* outAacname = "g711.aac";
 
-    FILE* fpIn = fopen(infilename, "rb");
-    if (NULL == fpIn)
+    auto fpIn = open_file(infilename, "rb");
+    if (!fpIn)
     {
-        printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, infilename);
+        std::printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, infilename);
         Easy_AACEncoder_Release(handle);
         return -1;
     }
 
-    FILE* fpOut = fopen(outAacname, "wb");
-    if (NULL == fpOut)
+    auto fpOut = open_file(outAacname, "wb");
+    if (!fpOut)
     {
-        printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, outAacname);
-        fclose(fpIn);
+        std::printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, outAacname);
         Easy_AACEncoder_Release(handle);
         return -1;
     }
@@ -72,26 +88,23 @@ int TestG711ToAAC_standard()
     unsigned int out_len = 0;
 
     size_t gBytesRead = 0;
-    while ((gBytesRead = fread(pbG711ABuffer.data(), 1, pbG711ABuffer.size(), fpIn)) > 0)
+    while ((gBytesRead = std::fread(pbG711ABuffer.data(), 1, pbG711ABuffer.size(), fpIn.get())) > 0)
     {
         if (Easy_AACEncoder_Encode(handle, pbG711ABuffer.data(), static_cast<unsigned int>(gBytesRead),
                                    pbAACBuffer.data(), &out_len) > 0)
         {
-            fwrite(pbAACBuffer.data(), 1, out_len, fpOut);
+            std::fwrite(pbAACBuffer.data(), 1, out_len, fpOut.get());
         }
     }
 
     Easy_AACEncoder_Release(handle);
-
-    fclose(fpIn);
-    fclose(fpOut);
 
     return 0;
 }
 
 #include <unistd.h>
 #include <time.h>
-static unsigned long long os_get_reltime(void)
+static unsigned long long os_get_reltime()
 {
     struct timespec tp;
     clock_gettime(CLOCK_MONOTONIC, &tp);
@@ -111,9 +124,9 @@ int TestG726ToAAC()
     initParam.g726param.ucRateBits = Rate40kBits;
 
     Easy_Handle handle = Easy_AACEncoder_Init(initParam);
-    if (handle == NULL)
+    if (handle == nullptr)
     {
-        printf("%s:[%d] init encoder failed\n", __FUNCTION__, __LINE__);
+        std::printf("%s:[%d] init encoder failed\n", __FUNCTION__, __LINE__);
         return -1;
     }
     // char* infilename = "encode_out_16.g726";
@@ -125,19 +138,18 @@ int TestG726ToAAC()
     const char* infilename = "encode_out_40.g726";
     const char* outAacname = "encode_out_40.aac";
 
-    FILE* fpIn = fopen(infilename, "rb");
-    if (NULL == fpIn)
+    auto fpIn = open_file(infilename, "rb");
+    if (!fpIn)
     {
-        printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, infilename);
+        std::printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, infilename);
         Easy_AACEncoder_Release(handle);
         return -1;
     }
 
-    FILE* fpOut = fopen(outAacname, "wb");
-    if (NULL == fpOut)
+    auto fpOut = open_file(outAacname, "wb");
+    if (!fpOut)
     {
-        printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, outAacname);
-        fclose(fpIn);
+        std::printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, outAacname);
         Easy_AACEncoder_Release(handle);
         return -1;
     }
@@ -150,13 +162,13 @@ int TestG726ToAAC()
     unsigned long long ts = os_get_reltime();
 
     size_t gBytesRead = 0;
-    while ((gBytesRead = fread(pbG726Buffer.data(), 1, pbG726Buffer.size(), fpIn)) > 0)
+    while ((gBytesRead = std::fread(pbG726Buffer.data(), 1, pbG726Buffer.size(), fpIn.get())) > 0)
     {
         if (Easy_AACEncoder_Encode(handle, pbG726Buffer.data(), static_cast<unsigned int>(gBytesRead),
                                    pbAACBuffer.data(), &out_len) > 0)
         {
-            fwrite(pbAACBuffer.data(), 1, out_len, fpOut);
-            printf("%s:[%d] pbAACBuffer(%u) len=%u \n", __FUNCTION__, __LINE__, bAACBufferSize, out_len);
+            std::fwrite(pbAACBuffer.data(), 1, out_len, fpOut.get());
+            std::printf("%s:[%d] pbAACBuffer(%u) len=%u \n", __FUNCTION__, __LINE__, bAACBufferSize, out_len);
         }
         while (os_get_reltime() < ts + 1000000 / 25)
         {
@@ -166,9 +178,6 @@ int TestG726ToAAC()
     }
 
     Easy_AACEncoder_Release(handle);
-
-    fclose(fpIn);
-    fclose(fpOut);
 
     return 0;
 }
@@ -186,9 +195,9 @@ int TestPcmToAAC()
     // initParam.g726param.ucRateBits=Rate40kBits;
 
     Easy_Handle handle = Easy_AACEncoder_Init(initParam);
-    if (handle == NULL)
+    if (handle == nullptr)
     {
-        printf("%s:[%d] init encoder failed\n", __FUNCTION__, __LINE__);
+        std::printf("%s:[%d] init encoder failed\n", __FUNCTION__, __LINE__);
         return -1;
     }
     // char* infilename = "encode_out_16.g726";
@@ -200,19 +209,18 @@ int TestPcmToAAC()
     const char* infilename = "playback.pcm";
     const char* outAacname = "playback.aac";
 
-    FILE* fpIn = fopen(infilename, "rb");
-    if (NULL == fpIn)
+    auto fpIn = open_file(infilename, "rb");
+    if (!fpIn)
     {
-        printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, infilename);
+        std::printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, infilename);
         Easy_AACEncoder_Release(handle);
         return -1;
     }
 
-    FILE* fpOut = fopen(outAacname, "wb");
-    if (NULL == fpOut)
+    auto fpOut = open_file(outAacname, "wb");
+    if (!fpOut)
     {
-        printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, outAacname);
-        fclose(fpIn);
+        std::printf("%s:[%d] open %s file failed\n", __FUNCTION__, __LINE__, outAacname);
         Easy_AACEncoder_Release(handle);
         return -1;
     }
@@ -224,20 +232,17 @@ int TestPcmToAAC()
     unsigned int out_len = 0;
 
     size_t gBytesRead = 0;
-    while ((gBytesRead = fread(pbPcmBuffer.data(), 1, pbPcmBuffer.size(), fpIn)) > 0)
+    while ((gBytesRead = std::fread(pbPcmBuffer.data(), 1, pbPcmBuffer.size(), fpIn.get())) > 0)
     {
         if ((Easy_AACEncoder_Encode(handle, pbPcmBuffer.data(), static_cast<unsigned int>(gBytesRead),
                                     pbAACBuffer.data(), &out_len)) > 0)
         {
-            fwrite(pbAACBuffer.data(), 1, out_len, fpOut);
-            printf("%s:[%d] pbAACBuffer(%u) len=%u \n", __FUNCTION__, __LINE__, bAACBufferSize, out_len);
+            std::fwrite(pbAACBuffer.data(), 1, out_len, fpOut.get());
+            std::printf("%s:[%d] pbAACBuffer(%u) len=%u \n", __FUNCTION__, __LINE__, bAACBufferSize, out_len);
         }
     }
 
     Easy_AACEncoder_Release(handle);
-
-    fclose(fpIn);
-    fclose(fpOut);
 
     return 0;
 }

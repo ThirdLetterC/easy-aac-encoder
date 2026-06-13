@@ -5,8 +5,8 @@
 class audio_buffer
 {
   public:
-    audio_buffer(void);
-    ~audio_buffer(void);
+    audio_buffer();
+    ~audio_buffer() = default;
 
     int write_data(const void *data, int len);
 
@@ -18,5 +18,5 @@ class audio_buffer
 
   private:
     std::vector<unsigned char> data_;
-    int len_;
+    int len_ = 0;
 };

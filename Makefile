@@ -14,7 +14,7 @@ SAMPLE_BIN := $(DIST_DIR)/testEasyAACEncoder
 INCLUDES := -IInclude -Isrc -Isrc/include -Isrc/libfaac -Isrc/libfaac/kiss_fft
 CPPFLAGS += $(INCLUDES)
 CXXFLAGS ?= -O2
-CXXFLAGS += -std=c++11 -Wall -Wextra -fPIC
+CXXFLAGS += -std=c++23 -Wall -Wextra -fPIC
 CFLAGS ?= -O2
 CFLAGS += -std=gnu99 -fPIC
 LDFLAGS +=
@@ -80,7 +80,7 @@ help:
 	@echo "  make static   Build dist/libEasyAACEncoder.a"
 	@echo "  make shared   Build dist/libEasyAACEncoder.so"
 	@echo "  make sample   Build dist/testEasyAACEncoder"
-	@echo "  make warnings Compile project-owned C++ sources with -Wall -Wextra -Werror"
+	@echo "  make warnings Compile project-owned C++23 sources with -Wall -Wextra -Werror"
 	@echo "  make fmt      Format tracked C/C++ files with clang-format"
 	@echo "  make clean    Remove generated build artifacts"
 

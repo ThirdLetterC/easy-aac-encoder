@@ -88,7 +88,7 @@ typedef struct _buffers_t
     void *pUserData;                 // Callback user data
 
     _buffers_t()
-        : rear(0), front(0), bufnum(0), fps(0), pOnVideoData(NULL), pUserData(NULL)
+        : rear(0), front(0), bufnum(0), fps(0), pOnVideoData(nullptr), pUserData(nullptr)
     {
         memset(buf, 0, sizeof(buf));
     }

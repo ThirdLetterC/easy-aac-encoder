@@ -27,10 +27,10 @@ int init_buffers(buffers_t *bufs, int bufsize, int bufnum)
         bufs->buf[i].frame_type = -1;
         bufs->buf[i].channel = -1;
         bufs->buf[i].frame_index = 0;
-        if (bufs->buf[i].start == NULL)
+        if (bufs->buf[i].start == nullptr)
             return -1;
     }
-    pthread_mutex_init(&(bufs->mutex), NULL);
+    pthread_mutex_init(&(bufs->mutex), nullptr);
     return 0;
 }
 
@@ -38,10 +38,10 @@ int free_buffers(buffers_t *bufs)
 {
     for (int i = 0; i < bufs->bufnum; i++)
     {
-        if (bufs->buf[i].start != NULL)
+        if (bufs->buf[i].start != nullptr)
             free(bufs->buf[i].start);
     }
-    bufs->pOnVideoData = NULL;
+    bufs->pOnVideoData = nullptr;
     pthread_mutex_destroy(&(bufs->mutex));
     return 0;
 }

@@ -241,7 +241,7 @@ int g711_decode(void *pout_buf, int *pout_len, const void *pin_buf, const int in
     int i = 0;
     int Ret = 0;
 
-    if ((NULL == pout_buf) || (NULL == pout_len) || (NULL == pin_buf) || (in_len <= 0))
+    if ((nullptr == pout_buf) || (nullptr == pout_len) || (nullptr == pin_buf) || (in_len <= 0))
     {
         return -1;
     }

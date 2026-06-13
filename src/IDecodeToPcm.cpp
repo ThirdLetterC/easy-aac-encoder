@@ -11,14 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-IDecodeToPcm::IDecodeToPcm(void)
-{
-}
-
-IDecodeToPcm::~IDecodeToPcm(void)
-{
-}
-//------------------------------------------------------------------------------------------------------------------------
 InAudioInfo::InAudioInfo()
 {
     InitParam &initParam = m_initparam;
@@ -31,16 +23,6 @@ InAudioInfo::InAudioInfo(InitParam param) : m_initparam(param)
 {
 }
 //------------------------------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------
-DecodeToPcmBase::DecodeToPcmBase(void)
-    : m_g7FrameSize(0)
-{
-}
-
-DecodeToPcmBase::~DecodeToPcmBase(void)
-{
-}
-
 int DecodeToPcmBase::Init(InAudioInfo info)
 {
     (void)info;
@@ -63,7 +45,7 @@ int DecodeToPcmBase::Decode(unsigned char *pout_buf, unsigned int *pout_len, con
     uint32_t i = 0;
     int Ret = 0;
 
-    if ((NULL == pout_buf) || (NULL == pout_len) || (NULL == pin_buf) || (0 == in_len))
+    if ((nullptr == pout_buf) || (nullptr == pout_len) || (nullptr == pin_buf) || (0 == in_len))
     {
         return -1;
     }

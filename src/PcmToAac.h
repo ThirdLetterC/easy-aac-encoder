@@ -20,8 +20,8 @@ extern "C"
 class PcmToAac
 {
   public:
-    PcmToAac(void);
-    ~PcmToAac(void);
+    PcmToAac() = default;
+    ~PcmToAac();
     PcmToAac(const PcmToAac&) = delete;
     PcmToAac& operator=(const PcmToAac&) = delete;
 
@@ -49,12 +49,12 @@ class PcmToAac
     }
 
   private:
-    faacEncHandle hEncoder;
-    faacEncConfigurationPtr pConfiguration;
+    faacEncHandle hEncoder = nullptr;
+    faacEncConfigurationPtr pConfiguration = nullptr;
 
-    unsigned int m_nPCMBitSize /*= 16*/;
+    unsigned int m_nPCMBitSize = 16;
 
-    unsigned long m_nInputSamples /*= 0*/;
+    unsigned long m_nInputSamples = 0;
 
-    unsigned long m_nMaxOutputBytes /*= 0*/;
+    unsigned long m_nMaxOutputBytes = 0;
 };

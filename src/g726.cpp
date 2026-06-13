@@ -70,8 +70,8 @@ static __inline int top_bit(unsigned int bits)
 
 static bitstream_state_t *bitstream_init(bitstream_state_t *s)
 {
-    if (s == NULL)
-        return NULL;
+    if (s == nullptr)
+        return nullptr;
     s->bitstream = 0;
     s->residue = 0;
     return s;
@@ -741,7 +741,7 @@ g726_state_t *g726_init(g726_state_t *s, int bit_rate)
     int i;
 
     if (bit_rate != 16000 && bit_rate != 24000 && bit_rate != 32000 && bit_rate != 40000)
-        return NULL;
+        return nullptr;
 
     s->yl = 34816;
     s->yu = 544;

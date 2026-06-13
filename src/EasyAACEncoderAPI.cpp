@@ -18,11 +18,11 @@
 
 Easy_API Easy_Handle Easy_APICALL Easy_AACEncoder_Init(InitParam initPar)
 {
-    std::unique_ptr<G7ToAac> encoder(new G7ToAac());
+    auto encoder = std::make_unique<G7ToAac>();
     InAudioInfo info(initPar);
     if (!encoder->init(info))
     {
-        return NULL;
+        return nullptr;
     }
     return encoder.release();
 }
@@ -36,7 +36,7 @@ Easy_API int Easy_APICALL Easy_AACEncoder_Encode(Easy_Handle handle, const unsig
 Easy_API int Easy_APICALL Easy_AACEncoder_EncodeEx(Easy_Handle handle, const unsigned char* inbuf, unsigned int inlen,
                                                    unsigned char* outbuf, unsigned int outcap, unsigned int* outlen)
 {
-    if (handle == NULL)
+    if (handle == nullptr)
     {
         return EasyAACEncoder_InvalidArgument;
     }
@@ -46,7 +46,7 @@ Easy_API int Easy_APICALL Easy_AACEncoder_EncodeEx(Easy_Handle handle, const uns
 
 Easy_API void Easy_APICALL Easy_AACEncoder_Release(Easy_Handle handle)
 {
-    if (handle != NULL)
+    if (handle != nullptr)
     {
         delete static_cast<G7ToAac*>(handle);
     }

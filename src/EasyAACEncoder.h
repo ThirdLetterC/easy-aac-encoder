@@ -23,8 +23,8 @@
 class G7ToAac
 {
   public:
-    G7ToAac();
-    ~G7ToAac();
+    G7ToAac() = default;
+    ~G7ToAac() = default;
 
     bool init();
     bool init(const InAudioInfo& info);
@@ -49,19 +49,19 @@ class G7ToAac
     bool CreateBuffer();
 
   private:
-    int nCount;
+    unsigned int nCount = 0;
 
-    int m_nPCMBufferSize;
+    unsigned int m_nPCMBufferSize = 0;
     std::vector<unsigned char> m_pbPCMBuffer;
 
-    unsigned long m_nMaxOutputBytes;
+    unsigned int m_nMaxOutputBytes = 0;
     std::vector<unsigned char> m_pbAACBuffer;
 
-    int m_nPCMSize;
+    unsigned int m_nPCMSize = 0;
     std::vector<unsigned char> m_pbPCMTmpBuffer;
 
     std::vector<unsigned char> m_pbG7FrameBuffer;
-    unsigned long m_nG7FrameBufferSize;
+    unsigned int m_nG7FrameBufferSize = 0;
 
     audio_buffer m_audio_buffer_;
     //------

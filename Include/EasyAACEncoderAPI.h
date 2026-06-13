@@ -11,8 +11,8 @@
 #define Easy_API
 #define Easy_APICALL
 
-#define Easy_Handle void*
-#define EasyAACEncoder_Handle Easy_Handle
+typedef void* Easy_Handle;
+typedef Easy_Handle EasyAACEncoder_Handle;
 
 enum EasyAACEncoderError
 {

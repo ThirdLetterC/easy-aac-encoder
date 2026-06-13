@@ -23,7 +23,7 @@
 #define G711_ONE_OFFSET 4
 #endif
 
-const int CON_PCM_SIZE = 320;
+inline constexpr int CON_PCM_SIZE = 320;
 
 class audio_buffer;
 
@@ -62,8 +62,8 @@ class InAudioInfo
 class IDecodeToPcm
 {
   public:
-    IDecodeToPcm(void);
-    virtual ~IDecodeToPcm(void);
+    IDecodeToPcm() = default;
+    virtual ~IDecodeToPcm() = default;
 
   public:
     virtual int Init(InAudioInfo info) = 0;
@@ -77,8 +77,8 @@ class IDecodeToPcm
 class DecodeToPcmBase : public IDecodeToPcm
 {
   public:
-    DecodeToPcmBase();
-    virtual ~DecodeToPcmBase();
+    DecodeToPcmBase() = default;
+    ~DecodeToPcmBase() override = default;
 
     int Init(InAudioInfo info) override;
 
@@ -90,7 +90,7 @@ class DecodeToPcmBase : public IDecodeToPcm
     virtual unsigned short DecodeOneChar(unsigned char data) = 0;
 
   private:
-    int m_g7FrameSize;
+    int m_g7FrameSize = 0;
 };
 
 #endif

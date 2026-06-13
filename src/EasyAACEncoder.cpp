@@ -13,10 +13,9 @@
 
 #include "EasyAACEncoder.h"
 #include <algorithm>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdint>
+#include <cstring>
+#include <ranges>
 
 // #include "g711.h"
 
@@ -25,20 +24,7 @@
 #include "outDebug.h"
 #include "G711AToPcm.h"
 #include "G726ToPcm.h"
-#include "condef.h"
 
-G7ToAac::G7ToAac()
-    : nCount(0),
-      m_nPCMBufferSize(0),
-      m_nMaxOutputBytes(0),
-      m_nPCMSize(0),
-      m_nG7FrameBufferSize(0)
-{
-}
-
-G7ToAac::~G7ToAac()
-{
-}
 bool G7ToAac::init()
 {
     nCount = 0;
@@ -60,15 +46,15 @@ bool G7ToAac::CreateDecodePcm()
 {
     if (Law_ALaw == m_inAudioInfo.CodecType())
     {
-        m_pDecodeToPcm.reset(new G711AToPcm());
+        m_pDecodeToPcm = std::make_unique<G711AToPcm>();
     }
     else if (Law_ULaw == m_inAudioInfo.CodecType())
     {
-        m_pDecodeToPcm.reset(new G711UToPcm());
+        m_pDecodeToPcm = std::make_unique<G711UToPcm>();
     }
     else if (Law_G726 == m_inAudioInfo.CodecType())
     {
-        m_pDecodeToPcm.reset(new G726ToPcm());
+        m_pDecodeToPcm = std::make_unique<G726ToPcm>();
     }
     else if (Law_PCM16 == m_inAudioInfo.CodecType())
     {
@@ -89,7 +75,7 @@ bool G7ToAac::CreateDecodePcm()
 }
 bool G7ToAac::CreateEncodeAac()
 {
-    m_pPCMToAAC.reset(new PcmToAac());
+    m_pPCMToAAC = std::make_unique<PcmToAac>();
     return m_pPCMToAAC->Init(&m_inAudioInfo);
 }
 bool G7ToAac::CreateBuffer()
@@ -100,7 +86,7 @@ bool G7ToAac::CreateBuffer()
     }
 
     m_nPCMBufferSize = m_pPCMToAAC->GetPCMBufferSize();
-    if (m_nPCMBufferSize <= 0)
+    if (m_nPCMBufferSize == 0)
     {
         return false;
     }
@@ -117,7 +103,7 @@ bool G7ToAac::CreateBuffer()
     {
         m_nG7FrameBufferSize = m_pDecodeToPcm->G7FrameSize();
         m_nPCMSize = m_pDecodeToPcm->PCMSize();
-        if (m_nG7FrameBufferSize == 0 || m_nPCMSize <= 0)
+        if (m_nG7FrameBufferSize == 0 || m_nPCMSize == 0)
         {
             return false;
         }
@@ -137,7 +123,7 @@ bool G7ToAac::CreateBuffer()
 int G7ToAac::aac_encode(const unsigned char* inbuf, unsigned int inlen, unsigned char* outbuf, unsigned int outcap,
                         unsigned int* outlen)
 {
-    if (outlen == NULL)
+    if (outlen == nullptr)
     {
         return EasyAACEncoder_InvalidArgument;
     }
@@ -148,7 +134,7 @@ int G7ToAac::aac_encode(const unsigned char* inbuf, unsigned int inlen, unsigned
         return 0;
     }
 
-    if (inbuf == NULL || outbuf == NULL || outcap == 0 || !m_pPCMToAAC)
+    if (inbuf == nullptr || outbuf == nullptr || outcap == 0 || !m_pPCMToAAC)
     {
         return EasyAACEncoder_InvalidArgument;
     }
@@ -186,7 +172,7 @@ int G7ToAac::encode_decoded_input(const unsigned char* inbuf, unsigned int inlen
             return EasyAACEncoder_BufferError;
         }
 
-        std::fill(m_pbPCMTmpBuffer.begin(), m_pbPCMTmpBuffer.end(), 0);
+        std::ranges::fill(m_pbPCMTmpBuffer, 0);
         unsigned int nPCMSize = static_cast<unsigned int>(m_pbPCMTmpBuffer.size());
         int nPCMRead = m_pDecodeToPcm->Decode(m_pbPCMTmpBuffer.data(), &nPCMSize, m_pbG7FrameBuffer.data(),
                                               static_cast<unsigned int>(buffer_len));
@@ -218,20 +204,20 @@ int G7ToAac::append_pcm_and_encode(const unsigned char* pcm, unsigned int pcm_le
     unsigned int offset = 0;
     while (offset < pcm_len)
     {
-        unsigned int space = static_cast<unsigned int>(m_pbPCMBuffer.size()) - static_cast<unsigned int>(nCount);
+        unsigned int space = static_cast<unsigned int>(m_pbPCMBuffer.size()) - nCount;
         unsigned int to_copy = std::min(space, pcm_len - offset);
-        memcpy(m_pbPCMBuffer.data() + nCount, pcm + offset, to_copy);
-        nCount += static_cast<int>(to_copy);
+        std::copy_n(pcm + offset, to_copy, m_pbPCMBuffer.data() + nCount);
+        nCount += to_copy;
         offset += to_copy;
 
-        if (nCount == static_cast<int>(m_pbPCMBuffer.size()))
+        if (nCount == m_pbPCMBuffer.size())
         {
             int ret = encode_current_pcm_frame(outbuf, outcap, outlen);
             if (ret < 0)
             {
                 return ret;
             }
-            std::fill(m_pbPCMBuffer.begin(), m_pbPCMBuffer.end(), 0);
+            std::ranges::fill(m_pbPCMBuffer, 0);
             nCount = 0;
         }
     }
@@ -241,9 +227,9 @@ int G7ToAac::append_pcm_and_encode(const unsigned char* pcm, unsigned int pcm_le
 
 int G7ToAac::encode_current_pcm_frame(unsigned char* outbuf, unsigned int outcap, unsigned int* outlen)
 {
-    std::fill(m_pbAACBuffer.begin(), m_pbAACBuffer.end(), 0);
+    std::ranges::fill(m_pbAACBuffer, 0);
     std::vector<int32_t> aligned_pcm((m_pbPCMBuffer.size() + sizeof(int32_t) - 1) / sizeof(int32_t), 0);
-    memcpy(aligned_pcm.data(), m_pbPCMBuffer.data(), m_pbPCMBuffer.size());
+    std::memcpy(aligned_pcm.data(), m_pbPCMBuffer.data(), m_pbPCMBuffer.size());
     int encoded = m_pPCMToAAC->Encode(aligned_pcm.data(), static_cast<unsigned int>(m_pbPCMBuffer.size()),
                                       m_pbAACBuffer.data(), static_cast<unsigned int>(m_pbAACBuffer.size()));
     if (encoded < 0)
@@ -259,7 +245,7 @@ int G7ToAac::encode_current_pcm_frame(unsigned char* outbuf, unsigned int outcap
         return EasyAACEncoder_BufferTooSmall;
     }
 
-    memcpy(outbuf + *outlen, m_pbAACBuffer.data(), static_cast<unsigned int>(encoded));
+    std::copy_n(m_pbAACBuffer.data(), static_cast<unsigned int>(encoded), outbuf + *outlen);
     *outlen += static_cast<unsigned int>(encoded);
     return *outlen;
 }

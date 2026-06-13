@@ -11,8 +11,8 @@
 class G711AToPcm : public DecodeToPcmBase
 {
   public:
-    G711AToPcm(void);
-    virtual ~G711AToPcm(void);
+    G711AToPcm() = default;
+    ~G711AToPcm() override = default;
 
   public:
     unsigned short DecodeOneChar(unsigned char data) override;
@@ -21,8 +21,8 @@ class G711AToPcm : public DecodeToPcmBase
 class G711UToPcm : public DecodeToPcmBase
 {
   public:
-    G711UToPcm(void);
-    virtual ~G711UToPcm(void);
+    G711UToPcm() = default;
+    ~G711UToPcm() override = default;
 
   public:
     unsigned short DecodeOneChar(unsigned char data) override;

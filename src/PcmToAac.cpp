@@ -9,15 +9,7 @@
 
 #include "outDebug.h"
 
-PcmToAac::PcmToAac(void)
-    : hEncoder(nullptr), pConfiguration(nullptr)
-{
-    m_nInputSamples = 0;
-    m_nMaxOutputBytes = 0;
-    m_nPCMBitSize = 16;
-}
-
-PcmToAac::~PcmToAac(void)
+PcmToAac::~PcmToAac()
 {
     if (hEncoder != nullptr)
     {
