@@ -42,7 +42,7 @@ Generated artifacts are written to `dist/`:
 
 * `dist/libEasyAACEncoder.a`
 * `dist/libEasyAACEncoder.so`
-* `dist/testEasyAACEncoder`
+* `dist/easy_aac_encoder_sample`
 
 Useful targets:
 
@@ -71,8 +71,8 @@ cmake --build build --target sample
 Run it from the sample-data directory so relative input paths resolve:
 
 ```sh
-cd testEasyAACEncoder
-../dist/testEasyAACEncoder
+cd examples/basic_transcoder
+../../dist/easy_aac_encoder_sample
 ```
 
 By default, the sample encodes `playback.pcm` to `playback.aac`. The same sample
@@ -81,7 +81,7 @@ source also includes G.711 and G.726 examples.
 
 ## Public API
 
-Include the public header:
+include the public header:
 
 ```c
 #include "EasyAACEncoderAPI.h"
@@ -148,12 +148,12 @@ enum Rate
 
 ## Repository Layout
 
-* `Include/` - public API header.
+* `include/` - public API header.
 * `src/` - EasyAACEncoder implementation and codec wrappers.
 * `src/libfaac/` - bundled FAAC encoder sources.
 * `src/include/` - bundled FAAC public headers.
 * `src/libfaac/kiss_fft/` - bundled Kiss FFT sources used by FAAC.
-* `testEasyAACEncoder/` - sample program and sample input data.
+* `examples/basic_transcoder/` - sample program and sample input data.
 
 
 ## Acknowledgements

@@ -5,7 +5,7 @@
     Website: http://www.easydarwin.org
 */
 
-#include "EasyDSSBuffers.h"
+#include "dss_buffers.h"
 
 int init_buffers(buffers_t *bufs, int bufsize, int bufnum)
 {

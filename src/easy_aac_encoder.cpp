@@ -11,7 +11,7 @@
  * Created on April 11, 2015, 11:44 AM
  */
 
-#include "EasyAACEncoder.h"
+#include "easy_aac_encoder.h"
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
@@ -21,9 +21,9 @@
 
 #include "EasyAACEncoderAPI.h"
 
-#include "outDebug.h"
-#include "G711AToPcm.h"
-#include "G726ToPcm.h"
+#include "out_debug.h"
+#include "g711_to_pcm.h"
+#include "g726_to_pcm.h"
 
 bool G7ToAac::init()
 {

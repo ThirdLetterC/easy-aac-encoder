@@ -5,7 +5,7 @@
     Website: http://www.easydarwin.org
 */
 
-#include "IDecodeToPcm.h"
+#include "decode_to_pcm.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -5,7 +5,7 @@
     Website: http://www.easydarwin.org
 */
 
-#include "G726ToPcm.h"
+#include "g726_to_pcm.h"
 #include <cstdlib>
 
 void G726StateDeleter::operator()(g726_state_t* state) const

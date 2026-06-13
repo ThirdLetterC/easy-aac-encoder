@@ -17,7 +17,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${EASYAAC_DIST_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${EASYAAC_DIST_DIR}")
 
 set(EASYAAC_INCLUDE_DIRS
-    "${CMAKE_SOURCE_DIR}/Include"
+    "${CMAKE_SOURCE_DIR}/include"
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/src/include"
     "${CMAKE_SOURCE_DIR}/src/libfaac"
@@ -25,14 +25,14 @@ set(EASYAAC_INCLUDE_DIRS
 )
 
 set(EASYAAC_OWNED_CPP_SOURCES
-    src/EasyAACEncoderAPI.cpp
-    src/EasyAACEncoder.cpp
-    src/IDecodeToPcm.cpp
-    src/G711AToPcm.cpp
-    src/G726ToPcm.cpp
-    src/PcmToAac.cpp
+    src/easy_aac_encoder_api.cpp
+    src/easy_aac_encoder.cpp
+    src/decode_to_pcm.cpp
+    src/g711_to_pcm.cpp
+    src/g726_to_pcm.cpp
+    src/pcm_to_aac.cpp
     src/audio_buffer.cpp
-    src/EasyDSSBuffers.cpp
+    src/dss_buffers.cpp
     src/g711.cpp
     src/g726.cpp
 )
@@ -66,7 +66,7 @@ add_library(EasyAACEncoder_shared SHARED ${EASYAAC_ALL_LIBRARY_SOURCES})
 foreach(target EasyAACEncoder_static EasyAACEncoder_shared)
     target_include_directories(${target}
         PUBLIC
-            "${CMAKE_SOURCE_DIR}/Include"
+            "${CMAKE_SOURCE_DIR}/include"
         PRIVATE
             ${EASYAAC_INCLUDE_DIRS}
     )
@@ -80,14 +80,14 @@ foreach(target EasyAACEncoder_static EasyAACEncoder_shared)
     )
 endforeach()
 
-add_executable(testEasyAACEncoder testEasyAACEncoder/main.cpp)
-target_include_directories(testEasyAACEncoder PRIVATE ${EASYAAC_INCLUDE_DIRS})
-target_compile_options(testEasyAACEncoder PRIVATE -Wall -Wextra)
-target_link_libraries(testEasyAACEncoder PRIVATE EasyAACEncoder_static m pthread)
+add_executable(easy_aac_encoder_sample examples/basic_transcoder/main.cpp)
+target_include_directories(easy_aac_encoder_sample PRIVATE ${EASYAAC_INCLUDE_DIRS})
+target_compile_options(easy_aac_encoder_sample PRIVATE -Wall -Wextra)
+target_link_libraries(easy_aac_encoder_sample PRIVATE EasyAACEncoder_static m pthread)
 
 add_custom_target(static DEPENDS EasyAACEncoder_static)
 add_custom_target(shared DEPENDS EasyAACEncoder_shared)
-add_custom_target(sample DEPENDS testEasyAACEncoder)
+add_custom_target(sample DEPENDS easy_aac_encoder_sample)
 
 add_library(EasyAACEncoder_warnings OBJECT ${EASYAAC_OWNED_CPP_SOURCES})
 target_include_directories(EasyAACEncoder_warnings PRIVATE ${EASYAAC_INCLUDE_DIRS})
@@ -103,7 +103,7 @@ add_custom_target(warnings
 )
 
 add_custom_target(clean-generated
-    COMMAND sh -c "rm -f src/testEasyAACEncoder/*.aac testEasyAACEncoder/*.aac"
+    COMMAND sh -c "rm -f examples/basic_transcoder/*.aac"
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMENT "Removing generated encoder outputs"
 )

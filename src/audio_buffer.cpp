@@ -1,6 +1,6 @@
 #include "audio_buffer.h"
-#include "EasyDSSBuffers.h"
-#include "outDebug.h"
+#include "dss_buffers.h"
+#include "out_debug.h"
 #include <algorithm>
 #include <cstring>
 

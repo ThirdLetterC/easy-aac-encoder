@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "IDecodeToPcm.h"
+#include "decode_to_pcm.h"
 
 extern "C"
 {

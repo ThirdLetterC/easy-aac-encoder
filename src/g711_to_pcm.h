@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#include "IDecodeToPcm.h"
+#include "decode_to_pcm.h"
 
 class G711AToPcm : public DecodeToPcmBase
 {

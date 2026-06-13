@@ -5,7 +5,7 @@
     Website: http://www.easydarwin.org
 */
 /*
- * File:   EasyAACEncoder.h
+ * File:   easy_aac_encoder.h
  * Author: Wellsen@easydarwin.org
  *
  * Created on April 11, 2015, 11:44 AM
@@ -15,8 +15,8 @@
 #define EasyAACEncoder_H
 
 #include "audio_buffer.h"
-#include "IDecodeToPcm.h"
-#include "PcmToAac.h"
+#include "decode_to_pcm.h"
+#include "pcm_to_aac.h"
 #include <memory>
 #include <vector>
 

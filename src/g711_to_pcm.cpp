@@ -5,7 +5,7 @@
     Website: http://www.easydarwin.org
 */
 
-#include "G711AToPcm.h"
+#include "g711_to_pcm.h"
 
 #include "g711.h"
 

@@ -12,7 +12,7 @@
  */
 
 #include "EasyAACEncoderAPI.h"
-#include "EasyAACEncoder.h"
+#include "easy_aac_encoder.h"
 #include <limits>
 #include <memory>
 

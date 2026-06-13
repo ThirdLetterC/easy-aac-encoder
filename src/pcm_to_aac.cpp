@@ -5,9 +5,9 @@
     Website: http://www.easydarwin.org
 */
 
-#include "PcmToAac.h"
+#include "pcm_to_aac.h"
 
-#include "outDebug.h"
+#include "out_debug.h"
 
 PcmToAac::~PcmToAac()
 {
