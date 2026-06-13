@@ -8,7 +8,7 @@
  * File:   EasyAACEncoder.cpp
  * Author: Wellsen@easydarwin.org
  *
- * Created on 2015年4月11日, 上午11:44
+ * Created on April 11, 2015, 11:44 AM
  */
 
 #include "EasyAACEncoder.h"

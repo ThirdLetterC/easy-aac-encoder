@@ -31,22 +31,22 @@ const int iMaxParamterNum = 128;
 const int iBufNum = 10;
 const int MAX_BUF_NUM = 50;
 const int iCharBufLen = 64;
-const char BoundTag[] = "\r\n";               // 帧间隔标识
-const int BoundTagLen = sizeof(BoundTag) - 1; // 帧间隔标识长度
-// const char IFrameTag[]  = "HISI264I";//录像I帧标志
-// const char PFrameTag[]  = "HISI264P";//录像P帧标志
-// const int FrameTagLen = sizeof(IFrameTag) - 1;// 录像帧标志长度
+const char BoundTag[] = "\r\n";               // Frame separator marker
+const int BoundTagLen = sizeof(BoundTag) - 1; // Frame separator marker length
+// const char IFrameTag[]  = "HISI264I";// Recording I-frame marker
+// const char PFrameTag[]  = "HISI264P";// Recording P-frame marker
+// const int FrameTagLen = sizeof(IFrameTag) - 1;// Recording frame marker length
 
-const int MaxWaitTime = 3000; // 超时时间
-const int MaxCameraNum = 24;  // 最大摄像机数量
+const int MaxWaitTime = 3000; // Timeout
+const int MaxCameraNum = 24;  // Maximum number of cameras
 
-const int AUDIO_BUFFER_SIZE = 960; // 定义播放的每一片缓冲都是800个字节
-const int MAX_AUDIO_BUF = 4;       // 播放缓冲的通知索引
+const int AUDIO_BUFFER_SIZE = 960; // Size of each playback buffer block
+const int MAX_AUDIO_BUF = 4;       // Notification index for the playback buffer
 const int BUFFERNOTIFYSIZE = AUDIO_BUFFER_SIZE;
-/*8192*/ /*192000*/ // 缓冲通知位置的大小，请参见DirectSound应用程序开发快速入门
-const int SAMPLE_RATE = 8000; /*44100*/ // pcm 的采样率  8k
-const int N_CHANNEL = 1; /*2*/          // PCM 声道数 单通道
-const int BITS_PER_SAMPLE = 16;         // 每个采样点的比特数
+/*8192*/ /*192000*/ // Buffer notification position size. See the DirectSound application development quick start.
+const int SAMPLE_RATE = 8000; /*44100*/ // PCM sample rate: 8k
+const int N_CHANNEL = 1; /*2*/          // Number of PCM channels: mono
+const int BITS_PER_SAMPLE = 16;         // Bits per sample
 const int CHANNEL = 1;
 const int SAMPLES_PER_SECOND = 8000;
 const int SIZE_AUDIO_FRAME = 960;
@@ -56,18 +56,21 @@ const int SIZE_AUDIO_FRAME = 960;
 #endif
 
 /*!
- \brief H264码流回调函数指针
- \param iPlayHandle 播放句柄
- \param sData 数据缓冲区
- \param iLen 数据长度
- \param iDataType 数据类型 0 - 实时数据流, 1 - 录像数据流, 2 - 本地采集的音频流, 3 - 设备发过来的音频流
+ \brief H264 stream callback function pointer
+ \param iPlayHandle Playback handle
+ \param sData Data buffer
+ \param iLen
+ Data length
+ \param iDataType Data type: 0 - live stream, 1 - recorded stream, 2 - locally captured audio stream, 3 -
+ audio stream sent by the device
 */
 typedef void (*fVideoDataCallBack)(int iPlayHandle, char *sData, int iLen, int iDataType, void *pUserData);
 
 /*!
- \brief 告警信息回调函数指针
- \param pAlarmInfo 告警信息T_JD_AlarmInfo结构体指针
- \param pUserData 用户数据
+ \brief Alarm message callback function pointer
+ \param pAlarmInfo Pointer to the alarm information T_JD_AlarmInfo
+ * structure
+ \param pUserData User data
 */
 typedef void (*fMessageCallBack)(void *pAlarmInfo, void *pUserData);
 
@@ -88,8 +91,8 @@ typedef struct _buffers_t
     int fps;
     pthread_mutex_t mutex;
     buffer_t buf[MAX_BUF_NUM];
-    fVideoDataCallBack pOnVideoData; // 数据回调函数指针
-    void *pUserData;                 // 回调函数用户数据
+    fVideoDataCallBack pOnVideoData; // Data callback function pointer
+    void *pUserData;                 // Callback user data
 
     _buffers_t()
     {

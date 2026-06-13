@@ -12,8 +12,8 @@
 
 using namespace std;
 
-// #define TEST_G711A_FILE       "src.g711a"  //私有
-#define TEST_G711A_FILE "g711.g711a" // 标准
+// #define TEST_G711A_FILE       "src.g711a"  // Private
+#define TEST_G711A_FILE "g711.g711a" // Standard
 
 #define TEST_AAC_FILE "dest.aac"
 
@@ -42,7 +42,7 @@ int TestG711ToAAC_standard()
     // initParam.ucAudioCodec = Law_ULaw;
 
     Easy_Handle handle = Easy_AACEncoder_Init(initParam);
-    char* infilename = "g711.g711a"; // 标准
+    char* infilename = "g711.g711a"; // Standard
     char* outAacname = "g711.aac";
 
     FILE* fpIn = fopen(infilename, "rb");
@@ -61,7 +61,7 @@ int TestG711ToAAC_standard()
 
     int gBytesRead = 0;
     int bG711ABufferSize = 500;
-    int bAACBufferSize = 4 * bG711ABufferSize; // 提供足够大的缓冲区
+    int bAACBufferSize = 4 * bG711ABufferSize; // Provide a sufficiently large buffer
     unsigned char* pbG711ABuffer = (unsigned char*)malloc(bG711ABufferSize * sizeof(unsigned char));
     unsigned char* pbAACBuffer = (unsigned char*)malloc(bAACBufferSize * sizeof(unsigned char));
     unsigned int out_len = 0;
@@ -132,7 +132,7 @@ int TestG726ToAAC()
 
     int gBytesRead = 0;
     int bG726BufferSize = 40000 / 8 / 25;
-    int bAACBufferSize = 4 * bG726BufferSize; // 提供足够大的缓冲区
+    int bAACBufferSize = 4 * bG726BufferSize; // Provide a sufficiently large buffer
     unsigned char* pbG726Buffer = (unsigned char*)malloc(bG726BufferSize * sizeof(unsigned char));
     unsigned char* pbAACBuffer = (unsigned char*)malloc(bAACBufferSize * sizeof(unsigned char));
     unsigned int out_len = 0;
@@ -201,7 +201,7 @@ int TestPcmToAAC()
 
     int gBytesRead = 0;
     int bPcmBufferSize = 44100 * 2 * 16 / 8 / 25;
-    int bAACBufferSize = 4 * bPcmBufferSize; // 提供足够大的缓冲区
+    int bAACBufferSize = 4 * bPcmBufferSize; // Provide a sufficiently large buffer
     unsigned char* pbPcmBuffer = (unsigned char*)malloc(bPcmBufferSize * sizeof(unsigned char));
     unsigned char* pbAACBuffer = (unsigned char*)malloc(bAACBufferSize * sizeof(unsigned char));
     unsigned int out_len = 0;

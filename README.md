@@ -12,10 +12,6 @@
 		./Buildit
 
 
-## Workflow ##
-![](http://www.easydarwin.org/skin/easydarwin/images/easyaacencoder20180822.png)
-
-
 ## Notes ##
 Audio formats currently supported by EasyAACEncoder:
 
@@ -45,5 +41,4 @@ Email: [support@easydarwin.org](mailto:support@easydarwin.org)
 Website: [www.EasyDarwin.org](http://www.easydarwin.org)
 
 Copyright &copy; EasyDarwin.org 2012-2019
-
-![EasyDarwin](http://www.easydarwin.org/skin/easydarwin/images/wx_qrcode.jpg)
+Copyright &copy; 2026 Yehor Smoliakov
