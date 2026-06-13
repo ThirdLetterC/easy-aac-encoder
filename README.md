@@ -34,6 +34,18 @@ Audio formats currently supported by EasyAACEncoder:
 	};
 
 
+## Acknowledgements ##
+
+EasyAACEncoder builds on work from the following projects and specifications:
+
+- [EasyDarwin](http://www.easydarwin.org), which organized and developed the original EasyAACEncoder library and API.
+- [FAAC](https://www.audiocoding.com/faac.html), the Freeware Advanced Audio Coder used for AAC encoding. The bundled FAAC sources are under `src/libfaac` and `src/include`.
+- [Kiss FFT](https://github.com/mborgerding/kissfft), used by the bundled FAAC implementation. The bundled Kiss FFT sources and license are under `src/libfaac/kiss_fft`.
+- ITU-T G.711 and G.726 audio codec specifications, which define the telephony audio formats decoded by this library before AAC encoding.
+
+Please review the license notices in the bundled source files before redistributing modified builds.
+
+
 ## More Information ##
 
 Email: [support@easydarwin.org](mailto:support@easydarwin.org) 
