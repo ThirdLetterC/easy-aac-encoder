@@ -5,6 +5,9 @@
     Website: http://www.easydarwin.org
 */
 
+#include <unistd.h>
+#include <time.h>
+
 #include "EasyAACEncoderAPI.h"
 #include <cstdio>
 #include <memory>
@@ -102,8 +105,6 @@ int TestG711ToAAC_standard()
     return 0;
 }
 
-#include <unistd.h>
-#include <time.h>
 static unsigned long long os_get_reltime()
 {
     struct timespec tp;

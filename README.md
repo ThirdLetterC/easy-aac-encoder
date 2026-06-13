@@ -7,9 +7,11 @@
 - **testEasyAACEncoder**: Transcodes G711A/G711U/G726 to AAC through the EasyAACEncoder API.
 
 	Build on Linux:
-		
-		chmod +x ./Buildit
-		./Buildit
+
+		cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+		cmake --build build
+
+	The build writes `libEasyAACEncoder.a`, `libEasyAACEncoder.so`, and the sample executable to `dist/`.
 
 
 ## Notes ##
