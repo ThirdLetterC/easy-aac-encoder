@@ -5,10 +5,10 @@
     Website: http://www.easydarwin.org
 */
 
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
 #include "g726.h"
+
+#include <bit>
+#include <cstdlib>
 
 static const int qtab_726_16[1] = {261};
 
@@ -18,54 +18,42 @@ static const int qtab_726_32[7] = {-124, 80, 178, 246, 300, 349, 400};
 
 static const int qtab_726_40[15] = {-122, -16, 68, 139, 198, 250, 298, 339, 378, 413, 445, 475, 502, 528, 553};
 
-static __inline int top_bit(unsigned int bits)
+/*
+ * Maps G.726 code words to reconstructed scale-factor normalized log
+ * magnitude values, scale-factor multipliers, and stationarity indicators.
+ */
+static const int g726_16_dqlntab[4] = {116, 365, 365, 116};
+static const int g726_16_witab[4] = {-704, 14048, 14048, -704};
+static const int g726_16_fitab[4] = {0x000, 0xE00, 0xE00, 0x000};
+
+static const int g726_24_dqlntab[8] = {-2048, 135, 273, 373, 373, 273, 135, -2048};
+static const int g726_24_witab[8] = {-128, 960, 4384, 18624, 18624, 4384, 960, -128};
+static const int g726_24_fitab[8] = {0x000, 0x200, 0x400, 0xE00, 0xE00, 0x400, 0x200, 0x000};
+
+static const int g726_32_dqlntab[16] = {-2048, 4,   135, 213, 273, 323, 373, 425,
+                                        425,   373, 323, 273, 213, 135, 4,   -2048};
+static const int g726_32_witab[16] = {-384,  576,   1312, 2048, 3584, 6336, 11360, 35904,
+                                      35904, 11360, 6336, 3584, 2048, 1312, 576,   -384};
+static const int g726_32_fitab[16] = {0x000, 0x000, 0x000, 0x200, 0x200, 0x200, 0x600, 0xE00,
+                                      0xE00, 0x600, 0x200, 0x200, 0x200, 0x000, 0x000, 0x000};
+
+static const int g726_40_dqlntab[32] = {-2048, -66, 28,  104, 169, 224, 274, 318, 358, 395,  429,
+                                        459,   488, 514, 539, 566, 566, 539, 514, 488, 459,  429,
+                                        395,   358, 318, 274, 224, 169, 104, 28,  -66, -2048};
+static const int g726_40_witab[32] = {448,  448,   768,   1248,  1280,  1312,  1856,  3200,  4512,  5728, 7008,
+                                      8960, 11456, 14080, 16928, 22272, 22272, 16928, 14080, 11456, 8960, 7008,
+                                      5728, 4512,  3200,  1856,  1312,  1280,  1248,  768,   448,   448};
+static const int g726_40_fitab[32] = {0x000, 0x000, 0x000, 0x000, 0x000, 0x200, 0x200, 0x200, 0x200, 0x200, 0x400,
+                                      0x600, 0x800, 0xA00, 0xC00, 0xC00, 0xC00, 0xC00, 0xA00, 0x800, 0x600, 0x400,
+                                      0x200, 0x200, 0x200, 0x200, 0x200, 0x000, 0x000, 0x000, 0x000, 0x000};
+
+static inline int top_bit(unsigned int bits)
 {
-#if defined(__i386__) || defined(__x86_64__)
-    int res;
-
-    __asm__(" xorl %[res],%[res];\n"
-            " decl %[res];\n"
-            " bsrl %[bits],%[res]\n"
-            : [res] "=&r"(res)
-            : [bits] "rm"(bits));
-    return res;
-#elif defined(__ppc__) || defined(__powerpc__)
-    int res;
-
-    __asm__("cntlzw %[res],%[bits];\n" : [res] "=&r"(res) : [bits] "r"(bits));
-    return 31 - res;
-#else
-    int res;
-
     if (bits == 0)
+    {
         return -1;
-    res = 0;
-    if (bits & 0xFFFF0000)
-    {
-        bits &= 0xFFFF0000;
-        res += 16;
     }
-    if (bits & 0xFF00FF00)
-    {
-        bits &= 0xFF00FF00;
-        res += 8;
-    }
-    if (bits & 0xF0F0F0F0)
-    {
-        bits &= 0xF0F0F0F0;
-        res += 4;
-    }
-    if (bits & 0xCCCCCCCC)
-    {
-        bits &= 0xCCCCCCCC;
-        res += 2;
-    }
-    if (bits & 0xAAAAAAAA)
-    {
-        res += 1;
-    }
-    return res;
-#endif
+    return static_cast<int>((sizeof(unsigned int) * 8U - 1U) - std::countl_zero(bits));
 }
 
 static bitstream_state_t *bitstream_init(bitstream_state_t *s)
@@ -168,7 +156,7 @@ static short fmult(short an, short srn)
 /*
  * Compute the estimated signal from the 6-zero predictor.
  */
-static __inline short predictor_zero(const g726_state_t *s)
+static inline short predictor_zero(const g726_state_t *s)
 {
     int i;
     int sezi;
@@ -184,12 +172,12 @@ static __inline short predictor_zero(const g726_state_t *s)
 /*
  * Computes the estimated signal from the 2-pole predictor.
  */
-static __inline short predictor_pole(const g726_state_t *s)
+static inline short predictor_pole(const g726_state_t *s)
 {
     return (fmult(s->a[1] >> 2, s->sr[1]) + fmult(s->a[0] >> 2, s->sr[0]));
 }
 
-static __inline short arithmetic_shift_right_5(short value)
+static inline short arithmetic_shift_right_5(short value)
 {
     if (value >= 0)
         return value >> 5;
@@ -740,6 +728,8 @@ g726_state_t *g726_init(g726_state_t *s, int bit_rate)
 {
     int i;
 
+    if (s == nullptr)
+        return nullptr;
     if (bit_rate != 16000 && bit_rate != 24000 && bit_rate != 32000 && bit_rate != 40000)
         return nullptr;
 
@@ -792,6 +782,12 @@ g726_state_t *g726_init(g726_state_t *s, int bit_rate)
 
 int g726_decode(g726_state_t *s, short amp[], const unsigned char g726_data[], int g726_bytes)
 {
+    if (s == nullptr || amp == nullptr || g726_data == nullptr || g726_bytes <= 0 || s->dec_func == nullptr ||
+        s->bits_per_sample <= 0)
+    {
+        return -1;
+    }
+
     int i;
     int samples;
     for (samples = i = 0;;)
@@ -817,6 +813,12 @@ int g726_decode(g726_state_t *s, short amp[], const unsigned char g726_data[], i
 
 int g726_encode(g726_state_t *s, unsigned char g726_data[], const short amp[], int len)
 {
+    if (s == nullptr || g726_data == nullptr || amp == nullptr || len <= 0 || s->enc_func == nullptr ||
+        s->bits_per_sample <= 0)
+    {
+        return -1;
+    }
+
     int i;
     int g726_bytes;
     for (g726_bytes = i = 0; i < len; i++)

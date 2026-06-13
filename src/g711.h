@@ -5,10 +5,9 @@
     Website: http://www.easydarwin.org
 */
 
-#ifndef __G_711_H_
-#define __G_711_H_
+#pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 enum _e_g711_tp
 {
@@ -26,5 +25,3 @@ unsigned char alaw2ulaw(unsigned char aval);
 unsigned char ulaw2alaw(unsigned char uval);
 
 int g711_decode(void *pout_buf, int *pout_len, const void *pin_buf, const int in_len, int type);
-
-#endif

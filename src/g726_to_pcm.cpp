@@ -6,50 +6,57 @@
 */
 
 #include "g726_to_pcm.h"
-#include <cstdlib>
 
-void G726StateDeleter::operator()(g726_state_t* state) const
+#include <cstddef>
+#include <limits>
+#include <utility>
+
+namespace
 {
-    std::free(state);
+int BitRateFromRateBits(unsigned char rateBits)
+{
+    switch (rateBits)
+    {
+    case Rate16kBits:
+        return 16000;
+    case Rate24kBits:
+        return 24000;
+    case Rate32kBits:
+        return 32000;
+    case Rate40kBits:
+        return 40000;
+    default:
+        return 0;
+    }
 }
+
+int BitsPerSampleFromBitRate(int bitRate)
+{
+    return bitRate / 8000;
+}
+} // namespace
 
 int G726ToPcm::Init(InAudioInfo info)
 {
+    m_state726.reset();
+    m_bitRate = BitRateFromRateBits(info.G726RateBits());
     m_g7FrameSize = G711_ONE_LEN;
-    m_state726.reset(static_cast<g726_state_t*>(std::malloc(sizeof(g726_state_t))));
-    if (!m_state726)
+    m_pcmSize = 0;
+
+    const int bitsPerSample = BitsPerSampleFromBitRate(m_bitRate);
+    if (bitsPerSample == 0)
     {
         return -1;
     }
 
-    switch (info.G726RateBits())
+    m_pcmSize = (m_g7FrameSize * 8 / bitsPerSample) * static_cast<int>(sizeof(short));
+    auto state = std::make_unique<g726_state_t>();
+    if (g726_init(state.get(), m_bitRate) == nullptr)
     {
-    case Rate16kBits:
-        m_bitRate = 8000 * 2;
-        m_pcmSize = (2 * m_g7FrameSize * 120 + 30) / 30;
-        break;
-    case Rate24kBits:
-        m_bitRate = 8000 * 3;
-        m_pcmSize = (2 * m_g7FrameSize * 80 + 30) / 30;
-        break;
-    case Rate32kBits:
-        m_bitRate = 8000 * 4;
-        m_pcmSize = (2 * m_g7FrameSize * 60 + 30) / 30;
-        break;
-    case Rate40kBits:
-        m_bitRate = 8000 * 5;
-        m_pcmSize = (2 * m_g7FrameSize * 48 + 30) / 30;
-        break;
-    default:
-        m_state726.reset();
         return -1;
     }
 
-    if (g726_init(m_state726.get(), m_bitRate) == nullptr)
-    {
-        m_state726.reset();
-        return -1;
-    }
+    m_state726 = std::move(state);
     return 0;
 }
 
@@ -59,12 +66,18 @@ int G726ToPcm::Decode(unsigned char* outbuf, unsigned int* outlen, const unsigne
     {
         return -1;
     }
-    if (*outlen < static_cast<unsigned int>(m_pcmSize))
+    const auto requiredOutputBytes =
+        (static_cast<std::size_t>(inlen) * 8 / static_cast<std::size_t>(m_state726->bits_per_sample)) * sizeof(short);
+    if (requiredOutputBytes > std::numeric_limits<unsigned int>::max())
+    {
+        return -2;
+    }
+    if (*outlen < requiredOutputBytes)
     {
         return -2;
     }
 
-    int decoded_samples = g726_decode(m_state726.get(), reinterpret_cast<short*>(outbuf), inbuf, inlen);
+    const int decoded_samples = g726_decode(m_state726.get(), reinterpret_cast<short*>(outbuf), inbuf, inlen);
     if (decoded_samples < 0)
     {
         return -1;

@@ -10,11 +10,6 @@
 #include "g726.h"
 #include <memory>
 
-struct G726StateDeleter
-{
-    void operator()(g726_state_t* state) const;
-};
-
 class G726ToPcm : public IDecodeToPcm
 {
   public:
@@ -22,6 +17,8 @@ class G726ToPcm : public IDecodeToPcm
     ~G726ToPcm() override = default;
     G726ToPcm(const G726ToPcm&) = delete;
     G726ToPcm& operator=(const G726ToPcm&) = delete;
+    G726ToPcm(G726ToPcm&&) = default;
+    G726ToPcm& operator=(G726ToPcm&&) = default;
 
   public:
     int Init(InAudioInfo info) override;
@@ -32,7 +29,7 @@ class G726ToPcm : public IDecodeToPcm
     int G7FrameSize() override;
 
   private:
-    std::unique_ptr<g726_state_t, G726StateDeleter> m_state726;
+    std::unique_ptr<g726_state_t> m_state726;
     int m_bitRate = 0;
 
     int m_g7FrameSize = 0;

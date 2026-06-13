@@ -1,4 +1,6 @@
 
+#pragma once
+
 /*! Bitstream handler state */
 typedef struct bitstream_state_s
 {
@@ -66,78 +68,6 @@ struct g726_state_s
     /*! \brief The current decoder function. */
     g726_decoder_func_t dec_func;
 };
-
-/*
- * Maps G.726_16 code word to reconstructed scale factor normalized log
- * magnitude values.
- */
-static const int g726_16_dqlntab[4] = {116, 365, 365, 116};
-
-/* Maps G.726_16 code word to log of scale factor multiplier. */
-static const int g726_16_witab[4] = {-704, 14048, 14048, -704};
-
-/*
- * Maps G.726_16 code words to a set of values whose long and short
- * term averages are computed and then compared to give an indication
- * how stationary (steady state) the signal is.
- */
-static const int g726_16_fitab[4] = {0x000, 0xE00, 0xE00, 0x000};
-
-/*
- * Maps G.726_24 code word to reconstructed scale factor normalized log
- * magnitude values.
- */
-static const int g726_24_dqlntab[8] = {-2048, 135, 273, 373, 373, 273, 135, -2048};
-
-/* Maps G.726_24 code word to log of scale factor multiplier. */
-static const int g726_24_witab[8] = {-128, 960, 4384, 18624, 18624, 4384, 960, -128};
-
-/*
- * Maps G.726_24 code words to a set of values whose long and short
- * term averages are computed and then compared to give an indication
- * how stationary (steady state) the signal is.
- */
-static const int g726_24_fitab[8] = {0x000, 0x200, 0x400, 0xE00, 0xE00, 0x400, 0x200, 0x000};
-
-/*
- * Maps G.726_32 code word to reconstructed scale factor normalized log
- * magnitude values.
- */
-static const int g726_32_dqlntab[16] = {-2048, 4, 135, 213, 273, 323, 373, 425, 425, 373, 323, 273, 213, 135, 4, -2048};
-
-/* Maps G.726_32 code word to log of scale factor multiplier. */
-static const int g726_32_witab[16] = {-384,  576,   1312, 2048, 3584, 6336, 11360, 35904,
-                                      35904, 11360, 6336, 3584, 2048, 1312, 576,   -384};
-
-/*
- * Maps G.726_32 code words to a set of values whose long and short
- * term averages are computed and then compared to give an indication
- * how stationary (steady state) the signal is.
- */
-static const int g726_32_fitab[16] = {0x000, 0x000, 0x000, 0x200, 0x200, 0x200, 0x600, 0xE00,
-                                      0xE00, 0x600, 0x200, 0x200, 0x200, 0x000, 0x000, 0x000};
-
-/*
- * Maps G.726_40 code word to ructeconstructed scale factor normalized log
- * magnitude values.
- */
-static const int g726_40_dqlntab[32] = {-2048, -66, 28,  104, 169, 224, 274, 318, 358, 395,  429,
-                                        459,   488, 514, 539, 566, 566, 539, 514, 488, 459,  429,
-                                        395,   358, 318, 274, 224, 169, 104, 28,  -66, -2048};
-
-/* Maps G.726_40 code word to log of scale factor multiplier. */
-static const int g726_40_witab[32] = {448,  448,   768,   1248,  1280,  1312,  1856,  3200,  4512,  5728, 7008,
-                                      8960, 11456, 14080, 16928, 22272, 22272, 16928, 14080, 11456, 8960, 7008,
-                                      5728, 4512,  3200,  1856,  1312,  1280,  1248,  768,   448,   448};
-
-/*
- * Maps G.726_40 code words to a set of values whose long and short
- * term averages are computed and then compared to give an indication
- * how stationary (steady state) the signal is.
- */
-static const int g726_40_fitab[32] = {0x000, 0x000, 0x000, 0x000, 0x000, 0x200, 0x200, 0x200, 0x200, 0x200, 0x400,
-                                      0x600, 0x800, 0xA00, 0xC00, 0xC00, 0xC00, 0xC00, 0xA00, 0x800, 0x600, 0x400,
-                                      0x200, 0x200, 0x200, 0x200, 0x200, 0x000, 0x000, 0x000, 0x000, 0x000};
 
 g726_state_t *g726_init(g726_state_t *s, int bit_rate);
 

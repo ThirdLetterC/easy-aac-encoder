@@ -9,12 +9,12 @@
 
 #include "g711.h"
 
-unsigned short G711AToPcm::DecodeOneChar(unsigned char data)
+unsigned short G711AToPcm::DecodeOneChar(unsigned char data) noexcept
 {
-    return (int16_t)alaw2linear(data);
+    return static_cast<unsigned short>(static_cast<int16_t>(alaw2linear(data)));
 }
-//-------------------------------------------
-unsigned short G711UToPcm::DecodeOneChar(unsigned char data)
+
+unsigned short G711UToPcm::DecodeOneChar(unsigned char data) noexcept
 {
-    return (int16_t)ulaw2linear(data);
+    return static_cast<unsigned short>(static_cast<int16_t>(ulaw2linear(data)));
 }

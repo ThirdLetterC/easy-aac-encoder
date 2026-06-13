@@ -15,7 +15,7 @@ class G711AToPcm : public DecodeToPcmBase
     ~G711AToPcm() override = default;
 
   public:
-    unsigned short DecodeOneChar(unsigned char data) override;
+    unsigned short DecodeOneChar(unsigned char data) noexcept override;
 };
 
 class G711UToPcm : public DecodeToPcmBase
@@ -25,5 +25,5 @@ class G711UToPcm : public DecodeToPcmBase
     ~G711UToPcm() override = default;
 
   public:
-    unsigned short DecodeOneChar(unsigned char data) override;
+    unsigned short DecodeOneChar(unsigned char data) noexcept override;
 };

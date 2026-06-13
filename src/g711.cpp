@@ -4,51 +4,51 @@
  * u-law, A-law and linear PCM conversions.
  */
 
-// #include "stdafx.h"
-#include <stdint.h>
-#include <stdio.h>
 #include "g711.h"
 
-#define SIGN_BIT (0x80)  /* Sign bit for a A-law byte. */
-#define QUANT_MASK (0xf) /* Quantization field mask. */
-#define NSEGS (8)        /* Number of A-law segments. */
-#define SEG_SHIFT (4)    /* Left shift for segment number. */
-#define SEG_MASK (0x70)  /* Segment field mask. */
+#include <cstdint>
 
-static short seg_end[8] = {0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0x1FFF, 0x3FFF, 0x7FFF};
+namespace
+{
+constexpr int SIGN_BIT = 0x80;  /* Sign bit for a A-law byte. */
+constexpr int QUANT_MASK = 0x0F; /* Quantization field mask. */
+constexpr int SEG_SHIFT = 4;     /* Left shift for segment number. */
+constexpr int SEG_MASK = 0x70;   /* Segment field mask. */
+constexpr int BIAS = 0x84;       /* Bias for linear code. */
+
+constexpr short seg_end[] = {0xFF, 0x1FF, 0x3FF, 0x7FF, 0xFFF, 0x1FFF, 0x3FFF, 0x7FFF};
 
 /* copy from CCITT G.711 specifications */
-unsigned char _u2a[128] = {/* u- to A-law conversions */
-                           1,   1,   2,   2,   3,   3,   4,   4,   5,   5,   6,   6,   7,   7,   8,   8,
-                           9,   10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24,
-                           25,  27,  29,  31,  33,  34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,
-                           46,  48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,  62,
-                           64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,
-                           81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,  96,
-                           97,  98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112,
-                           113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128};
+constexpr unsigned char u2a[128] = {/* u- to A-law conversions */
+                                    1,   1,   2,   2,   3,   3,   4,   4,   5,   5,   6,   6,   7,   7,   8,   8,
+                                    9,   10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24,
+                                    25,  27,  29,  31,  33,  34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,
+                                    46,  48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,  62,
+                                    64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,
+                                    81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,  96,
+                                    97,  98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112,
+                                    113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128};
 
-unsigned char _a2u[128] = {/* A- to u-law conversions */
-                           1,   3,   5,   7,   9,   11,  13,  15,  16,  17,  18,  19,  20,  21,  22,  23,
-                           24,  25,  26,  27,  28,  29,  30,  31,  32,  32,  33,  33,  34,  34,  35,  35,
-                           36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  48,  49,  49,
-                           50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,  62,  63,  64,  64,
-                           65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  79,
-                           80,  81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,
-                           96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
-                           112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127};
+constexpr unsigned char a2u[128] = {/* A- to u-law conversions */
+                                    1,   3,   5,   7,   9,   11,  13,  15,  16,  17,  18,  19,  20,  21,  22,  23,
+                                    24,  25,  26,  27,  28,  29,  30,  31,  32,  32,  33,  33,  34,  34,  35,  35,
+                                    36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  48,  49,  49,
+                                    50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,  62,  63,  64,  64,
+                                    65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  79,
+                                    80,  81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,
+                                    96,  97,  98,  99,  100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
+                                    112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127};
 
-static int search(int val, short *table, int size)
+int search(int val, const short *table, int size)
 {
-    int i;
-
-    for (i = 0; i < size; i++)
+    for (int i = 0; i < size; i++)
     {
         if (val <= *table++)
-            return (i);
+            return i;
     }
-    return (size);
+    return size;
 }
+} // namespace
 
 /*
  * linear2alaw() - Convert a 16-bit linear PCM value to 8-bit A-law
@@ -129,8 +129,6 @@ int alaw2linear(unsigned char a_val)
     }
     return ((a_val & SIGN_BIT) ? t : -t);
 }
-
-#define BIAS (0x84) /* Bias for linear code. */
 
 /*
  * linear2ulaw() - Convert a linear PCM value to u-law
@@ -224,53 +222,49 @@ int ulaw2linear(unsigned char u_val)
 unsigned char alaw2ulaw(unsigned char aval)
 {
     aval &= 0xff;
-    return ((aval & 0x80) ? (0xFF ^ _a2u[aval ^ 0xD5]) : (0x7F ^ _a2u[aval ^ 0x55]));
+    return ((aval & 0x80) ? (0xFF ^ a2u[aval ^ 0xD5]) : (0x7F ^ a2u[aval ^ 0x55]));
 }
 
 /* u-law to A-law conversion */
 unsigned char ulaw2alaw(unsigned char uval)
 {
     uval &= 0xff;
-    return ((uval & 0x80) ? (0xD5 ^ (_u2a[0xFF ^ uval] - 1)) : (0x55 ^ (_u2a[0x7F ^ uval] - 1)));
+    return ((uval & 0x80) ? (0xD5 ^ (u2a[0xFF ^ uval] - 1)) : (0x55 ^ (u2a[0x7F ^ uval] - 1)));
 }
 
 int g711_decode(void *pout_buf, int *pout_len, const void *pin_buf, const int in_len, int type)
 {
-    int16_t *dst = reinterpret_cast<int16_t *>(pout_buf);
-    const uint8_t *src = reinterpret_cast<const uint8_t *>(pin_buf);
-    int i = 0;
-    int Ret = 0;
-
     if ((nullptr == pout_buf) || (nullptr == pout_len) || (nullptr == pin_buf) || (in_len <= 0))
     {
         return -1;
     }
-
+    if (type != TP_ALAW && type != TP_ULAW)
+    {
+        return -3;
+    }
     if (*pout_len < 2 * in_len)
     {
         return -2;
     }
-    //---{{{
+
+    auto *dst = static_cast<int16_t *>(pout_buf);
+    const auto *src = static_cast<const uint8_t *>(pin_buf);
+
     if (TP_ALAW == type)
     {
-        for (i = 0; i < in_len; i++)
+        for (int i = 0; i < in_len; i++)
         {
-            //*(dst++) = alawtos16[*(src++)];
-            *(dst++) = (int16_t)alaw2linear(*(src++));
+            *(dst++) = static_cast<int16_t>(alaw2linear(*(src++)));
         }
     }
     else
     {
-        for (i = 0; i < in_len; i++)
+        for (int i = 0; i < in_len; i++)
         {
-            //*(dst++) = alawtos16[*(src++)];
-            *(dst++) = (int16_t)ulaw2linear(*(src++));
+            *(dst++) = static_cast<int16_t>(ulaw2linear(*(src++)));
         }
     }
 
-    //---}}}
     *pout_len = 2 * in_len;
-
-    Ret = 2 * in_len;
-    return Ret;
+    return *pout_len;
 }
